@@ -1038,7 +1038,7 @@ function viewChecklistResult(){
         <p class="sum-note">此段文字由頁面根據你選擇的星座與整體相似度，在你的瀏覽器中自動組合，每次的說法會略有不同，僅供自我反思參考，不是預測。</p></div>
       <div class="share-sec"><h3 style="font-family:var(--serif);margin:0">🎁 我的結果圖</h3>
         <div id="sh-img"></div>
-        <div class="sh-acts"><button class="btn primary" type="button" id="sh-copy">📋 複製分享文字</button><button class="btn" type="button" id="sh-dl">🖼️ 查看結果圖</button></div>
+        <div class="sh-acts"><button class="btn primary" type="button" id="sh-copy">📋 複製分享文字</button></div>
         <div class="sh-msg" id="sh-msg" role="status" aria-live="polite"></div>
         <p class="sh-hint">分享時會附上一句邀請語：「${esc(info.invite)}」</p>
         <div id="sh-extra"></div></div>
@@ -1110,7 +1110,6 @@ function viewChecklistResult(){
     };
     try{ if(document.fonts&&document.fonts.ready){ Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1200))]).then(fin,fin); } else fin(); }catch(e){ fin(); }
   };
-  $("#sh-dl").addEventListener("click",()=>{ genImg(); const im=$("#sh-img"); if(im&&im.scrollIntoView){ try{ im.scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){} } });
   genImg();
 }
 /* ---------- routing ---------- */
