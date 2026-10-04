@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>星空小宇宙 · 太陽・月亮・上升 星座互動圖鑑</title>
+<meta name="description" content="用互動方式探索十二星座的太陽、月亮與上升，並用 Big Three 組合器組合出你的星盤小卡。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070718; --bg2:#0e0e2b; --ink:#f1efff; --mute:#b9b6dc; --line:rgba(255,255,255,.14);
+  --glass:rgba(255,255,255,.07); --glass2:rgba(255,255,255,.12);
+  --fire-a:#ff7a45; --fire-b:#ffc14d;
+  --earth-a:#4fc47f; --earth-b:#d8b86a;
+  --air-a:#52c7ff; --air-b:#b79cff;
+  --water-a:#7a8cff; --water-b:#d27dff;
+  --a:#b79cff; --b:#52c7ff;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU","Source Han Serif TC",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC","Source Han Sans TC",system-ui,sans-serif;
+}
+[data-el="fire"]{--a:var(--fire-a);--b:var(--fire-b)}
+[data-el="earth"]{--a:var(--earth-a);--b:var(--earth-b)}
+[data-el="air"]{--a:var(--air-a);--b:var(--air-b)}
+[data-el="water"]{--a:var(--water-a);--b:var(--water-b)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);color:var(--ink);background:radial-gradient(1200px 700px at 80% -10%,#2a1a5e55,transparent),radial-gradient(900px 600px at -10% 30%,#0b3a6b44,transparent),linear-gradient(180deg,var(--bg),var(--bg2) 60%,var(--bg));min-height:100vh;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid #fff;outline-offset:3px;border-radius:10px}
+.skip{position:absolute;left:-999px;top:8px;background:#fff;color:#000;padding:8px 14px;border-radius:8px;z-index:100}
+.skip:focus{left:8px}
+header.top{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(7,7,24,.62);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{font-family:var(--serif);font-weight:900;font-size:1.15rem;text-decoration:none;display:flex;gap:8px;align-items:center;margin-right:auto;background:none;border:0;padding:4px 0}
+.logo i{font-style:normal;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:conic-gradient(from 0deg,var(--fire-a),var(--earth-a),var(--air-a),var(--water-b),var(--fire-a));color:#fff;font-size:1rem;animation:spin 14s linear infinite}
+nav.top-nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav-btn{border:1px solid transparent;background:transparent;padding:6px 14px;border-radius:999px;text-decoration:none;font-size:.95rem;transition:.2s}
+.nav-btn:hover{background:var(--glass2);border-color:var(--line)}
+main{position:relative;z-index:1;max-width:1180px;margin:auto;padding:0 20px 60px}
+.view{animation:viewIn .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes viewIn{from{opacity:0;transform:translateY(22px) scale(.99);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes shimmer{to{background-position:200% center}}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;align-items:center;padding:44px 0 20px;min-height:78vh}
+.eyebrow{display:inline-block;padding:4px 14px;border:1px solid var(--line);border-radius:999px;background:var(--glass);font-size:.85rem;color:var(--mute);letter-spacing:.08em}
+h1.title{font-family:var(--serif);font-size:clamp(2.4rem,6.4vw,4.6rem);line-height:1.12;margin:16px 0 14px;font-weight:900;background:linear-gradient(90deg,#ffd27a,#ff8aa8,#a58bff,#5ed0ff,#ffd27a);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 9s linear infinite}
+.lead{font-size:1.1rem;color:var(--mute);max-width:34em;margin:0 0 26px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{position:relative;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--glass);padding:12px 22px;border-radius:999px;font-weight:700;text-decoration:none;transition:transform .2s,box-shadow .25s,background .2s;backdrop-filter:blur(8px)}
+.btn:hover{transform:translateY(-3px);background:var(--glass2);box-shadow:0 10px 30px -8px var(--a)}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn.primary{background:linear-gradient(120deg,#ff9a5a,#ff5d9e 45%,#8a6bff);border-color:transparent;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.stats{display:flex;gap:22px;margin-top:28px;color:var(--mute);font-size:.9rem;flex-wrap:wrap}
+.stats b{font-family:var(--serif);font-size:1.5rem;color:#fff;display:block}
+
+/* WHEEL */
+.wheel-wrap{position:relative;display:grid;place-items:center}
+svg.wheel{width:min(100%,520px);height:auto;overflow:visible;filter:drop-shadow(0 0 40px rgba(130,110,255,.35))}
+.ring{transform-origin:260px 260px;animation:spin 120s linear infinite}
+.seg{cursor:pointer;transition:filter .2s,transform .25s;transform-origin:260px 260px;outline:none}
+.seg path{transition:opacity .2s,stroke-width .2s}
+.seg:hover,.seg:focus-visible{filter:brightness(1.35) drop-shadow(0 0 10px var(--a));transform:scale(1.045)}
+.seg:focus-visible path{stroke:#fff;stroke-width:3}
+.seg text{pointer-events:none;font-family:var(--sans)}
+.wheel-center{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;text-align:center}
+.wc-in{width:34%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;align-content:center;background:radial-gradient(circle,rgba(20,18,60,.9),rgba(10,10,36,.55));border:1px solid var(--line);transition:.3s}
+.wc-glyph{font-size:clamp(2rem,6vw,3.2rem);line-height:1;color:var(--a);transition:.3s;font-family:"Segoe UI Symbol","Noto Sans Symbols","Noto Sans Symbols 2","Apple Symbols",var(--sans)}
+.wc-name{font-family:var(--serif);font-weight:900;font-size:clamp(.85rem,2.2vw,1.1rem)}
+.wc-sub{font-size:.72rem;color:var(--mute)}
+
+/* SECTION */
+section.block{padding:54px 0 10px}
+.sec-h{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+h2.sec-t{font-family:var(--serif);font-size:clamp(1.6rem,4vw,2.3rem);margin:0;font-weight:900}
+.sec-s{color:var(--mute);margin:4px 0 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--glass);padding:7px 16px;border-radius:999px;font-weight:700;transition:.2s;font-size:.95rem}
+.chip:hover{transform:translateY(-2px);background:var(--glass2)}
+.chip[aria-pressed="true"]{background:linear-gradient(120deg,var(--a),var(--b));color:#10102a;border-color:transparent;box-shadow:0 6px 22px -6px var(--a)}
+
+/* CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;perspective:1100px}
+.card{--rx:0deg;--ry:0deg;position:relative;text-align:left;border:1px solid var(--line);border-radius:22px;padding:20px 18px 18px;background:linear-gradient(160deg,color-mix(in srgb,var(--a) 22%,transparent),rgba(255,255,255,.05) 55%),rgba(14,14,43,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow:hidden;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .15s ease-out,box-shadow .3s,border-color .3s,opacity .35s;display:block;width:100%;min-height:228px;text-decoration:none}
+.card::before{content:"";position:absolute;width:220px;height:220px;left:var(--mx,50%);top:var(--my,0%);translate:-50% -50%;background:radial-gradient(circle,var(--b),transparent 65%);opacity:0;transition:opacity .3s;mix-blend-mode:screen;pointer-events:none}
+.card:hover,.card:focus-visible{border-color:var(--a);box-shadow:0 18px 44px -14px var(--a)}
+.card:hover::before{opacity:.32}
+.card .g{font-size:3.1rem;line-height:1;color:var(--b);filter:drop-shadow(0 0 12px var(--a));font-family:"Segoe UI Symbol","Noto Sans Symbols","Noto Sans Symbols 2","Apple Symbols",var(--sans);transition:transform .4s}
+.card:hover .g{transform:scale(1.18) rotate(-8deg)}
+.card h3{font-family:var(--serif);font-size:1.3rem;margin:10px 0 0;font-weight:900}
+.card .en{font-size:.82rem;color:var(--mute);letter-spacing:.06em}
+.card .dt{font-size:.85rem;color:var(--mute);margin-top:2px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.tag{font-size:.74rem;padding:2px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--a) 70%,#fff 0%);background:color-mix(in srgb,var(--a) 20%,transparent);color:#fff}
+.card .kw{margin-top:12px;font-size:.84rem;color:#e4e1ff;max-height:0;opacity:0;overflow:hidden;transition:max-height .4s,opacity .4s}
+.card:hover .kw,.card:focus-visible .kw{max-height:90px;opacity:1}
+.card.hide{display:none}
+@media (hover:none){.card .kw{max-height:90px;opacity:1}}
+
+/* ELEMENT / MODE */
+.el-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.panel{border:1px solid var(--line);border-radius:22px;padding:20px;background:linear-gradient(160deg,color-mix(in srgb,var(--a) 16%,transparent),rgba(255,255,255,.04)),rgba(14,14,43,.55);backdrop-filter:blur(10px)}
+.panel h3{margin:0 0 6px;font-family:var(--serif);font-size:1.2rem;color:var(--b)}
+.panel p{margin:6px 0}
+.mini{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.mini button{border:1px solid var(--line);background:var(--glass);padding:3px 12px;border-radius:999px;font-size:.88rem;transition:.2s}
+.mini button:hover{background:var(--a);color:#10102a}
+.pc{font-size:.92rem}
+.pc b{color:var(--b)}
+.note{border-left:4px solid var(--b);padding:8px 14px;margin:16px 0 0;background:var(--glass);border-radius:0 12px 12px 0;color:#ddd9ff}
+table.bt{width:100%;border-collapse:collapse;margin-top:6px}
+.bt th,.bt td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.bt th{color:var(--mute);font-weight:500;font-size:.9rem}
+.scroll-x{overflow-x:auto}
+ol.pri{padding-left:1.2em;margin:6px 0}
+ol.pri li{margin:8px 0}
+
+/* DETAIL */
+.crumbs{display:flex;gap:10px;align-items:center;padding:22px 0 8px;flex-wrap:wrap}
+.d-hero{position:relative;border:1px solid var(--line);border-radius:30px;padding:30px 28px;overflow:hidden;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 34%,transparent),color-mix(in srgb,var(--b) 10%,transparent) 60%,transparent),rgba(14,14,43,.6);backdrop-filter:blur(12px);display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}
+.d-glyph{font-size:clamp(5rem,16vw,9rem);line-height:1;color:var(--b);filter:drop-shadow(0 0 28px var(--a));animation:floaty 5s ease-in-out infinite;font-family:"Segoe UI Symbol","Noto Sans Symbols","Noto Sans Symbols 2","Apple Symbols",var(--sans)}
+.d-hero h2{font-family:var(--serif);font-size:clamp(2rem,6vw,3.4rem);margin:0;font-weight:900;line-height:1.1}
+.d-hero .en{color:var(--mute);letter-spacing:.12em}
+.tabs{display:flex;gap:10px;margin:22px 0 6px;flex-wrap:wrap}
+.tab{flex:1 1 150px;border:1px solid var(--line);background:var(--glass);border-radius:18px;padding:12px 16px;font-weight:700;font-size:1.02rem;transition:.25s;display:flex;align-items:center;justify-content:center;gap:8px}
+.tab:hover{transform:translateY(-3px);background:var(--glass2)}
+.tab[aria-selected="true"]{background:linear-gradient(120deg,var(--a),var(--b));color:#10102a;border-color:transparent;box-shadow:0 10px 28px -8px var(--a)}
+.tab small{font-weight:500;opacity:.8}
+.tp{animation:viewIn .45s both}
+.sections{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;margin-top:16px}
+.sec{border:1px solid var(--line);border-radius:20px;padding:18px 20px;background:rgba(14,14,43,.58);backdrop-filter:blur(10px);position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
+.sec:hover{transform:translateY(-4px);border-color:var(--a)}
+.sec.wide{grid-column:1/-1}
+.sec h4{margin:0 0 6px;font-size:1rem;display:flex;gap:8px;align-items:center;color:var(--b)}
+.sec h4 .ic{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:10px;background:color-mix(in srgb,var(--a) 28%,transparent);font-size:1rem}
+.sec p{margin:0;white-space:pre-line}
+.sec.good{border-color:color-mix(in srgb,#7dffb0 40%,transparent)}
+.sec.dark{border-color:color-mix(in srgb,#ff7d9a 40%,transparent);background:rgba(30,10,35,.55)}
+.sec ul{margin:6px 0 10px;padding-left:1.3em}
+.kwrow{display:flex;gap:8px;flex-wrap:wrap}
+.kw-chip{padding:5px 15px;border-radius:999px;font-weight:700;background:linear-gradient(120deg,color-mix(in srgb,var(--a) 55%,#000),color-mix(in srgb,var(--b) 40%,#000));border:1px solid color-mix(in srgb,var(--b) 50%,transparent);animation:pop .5s both}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.sum{position:relative;border-radius:22px;padding:22px 24px;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 22%,transparent),color-mix(in srgb,var(--b) 10%,transparent));border:1px dashed var(--b);margin-top:16px}
+.sum h4{margin:0 0 8px;font-family:var(--serif);font-size:1.15rem}
+.sum ul{margin:6px 0 10px;padding-left:1.3em}
+.sum p{margin:6px 0}
+.wip{text-align:center;border:1px dashed var(--line);border-radius:22px;padding:40px 20px;color:var(--mute);margin-top:16px}
+.wip .em{font-size:2.6rem;display:block;animation:floaty 3s ease-in-out infinite}
+.pn{display:flex;justify-content:space-between;gap:12px;margin-top:30px;flex-wrap:wrap}
+.pn .btn{flex:1 1 200px;justify-content:center}
+.pn .btn small{display:block;color:var(--mute);font-weight:400;line-height:1.2}
+.row-act{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+
+/* CHECKLIST */
+.cl-top{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-top:10px}
+.ring-p{--p:0;width:112px;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--a) calc(var(--p)*1%),rgba(255,255,255,.12) 0);display:grid;place-items:center;position:relative;transition:background .4s;flex:none}
+.ring-p::after{content:"";position:absolute;inset:10px;border-radius:50%;background:#10102c}
+.ring-p b{position:relative;z-index:1;font-family:var(--serif);font-size:1.5rem}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:width .4s}
+.cl-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:18px}
+.cl-group{margin-top:16px}
+.cl-group h3{font-family:var(--serif);margin:0 0 8px;font-size:1.15rem;color:var(--b);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cl-group h3 small{font-family:var(--sans);font-weight:500;color:var(--mute);font-size:.82rem}
+.cl-item{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:rgba(14,14,43,.58);margin:8px 0;cursor:pointer;transition:.25s;position:relative}
+.cl-item:hover{border-color:var(--a);transform:translateX(4px)}
+.cl-item input{position:absolute;opacity:0;pointer-events:none}
+.cl-box{flex:none;width:26px;height:26px;border-radius:9px;border:2px solid var(--b);display:grid;place-items:center;color:transparent;font-weight:900;transition:.25s;margin-top:1px}
+.cl-item input:checked + .cl-box{background:linear-gradient(120deg,var(--a),var(--b));color:#10102a;transform:rotate(360deg) scale(1.05);border-color:transparent}
+.cl-item input:focus-visible + .cl-box{outline:3px solid #fff;outline-offset:3px}
+.cl-item input:checked ~ .cl-tx{color:#cfcaf5}
+.cl-tx{flex:1}
+.cl-hint{border:1px dashed var(--line);border-radius:16px;padding:14px 16px;color:var(--mute);margin:8px 0}
+.cl-tabs .tab small{font-weight:700;opacity:1;background:rgba(0,0,0,.25);padding:0 9px;border-radius:99px}
+.cl-tabs .tab[aria-selected="true"] small{background:rgba(255,255,255,.4)}
+@media (max-width:520px){.cl-top{grid-template-columns:1fr;justify-items:center;text-align:center}}
+
+
+/* RESULT */
+.rs-all{display:flex;gap:22px;align-items:center;margin-top:8px}
+.rs-all>div:last-child{flex:1}
+.rs-big{font-family:var(--serif);font-weight:900;font-size:clamp(3rem,10vw,4.6rem);line-height:1;color:var(--b);flex:none}
+.rs-big small{font-size:.4em}
+.rs-bar{height:16px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:8px 0 4px}
+.rs-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b));transition:width .6s}
+.rs-rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:14px}
+.rs-rh{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rs-line{font-weight:700;margin-top:2px}
+.rs-concl{margin-top:14px}
+.rs-concl h3{font-family:var(--serif);margin:0 0 6px;color:var(--b)}
+.rs-concl p{margin:6px 0}
+.rs-barnum{font-size:.92rem;color:#ddd9ff;border-left:4px solid #ffd27a;padding-left:12px}
+.rs-empty{text-align:center;padding:34px 20px;margin-top:10px}
+@media (max-width:520px){.rs-all{flex-direction:column;text-align:center}.rs-all>div:last-child{width:100%}}
+
+
+/* RESULT EXTRAS */
+.rs-cmp{margin-top:6px;font-weight:700}
+.rs-cmp small{display:block;font-weight:400;color:var(--mute)}
+.up{color:#8dffbf}.down{color:#ffc0cc}.same{color:#e4e1ff}
+.rs-badge{font-size:.85rem;font-weight:700;margin-left:6px}
+.kind{margin-top:14px;border:1px solid var(--line);border-radius:22px;padding:20px 22px;background:linear-gradient(135deg,rgba(255,138,168,.16),rgba(138,107,255,.16));backdrop-filter:blur(10px)}
+.kind h3{margin:0 0 6px;font-family:var(--serif)}
+.kind p{margin:0}
+.share-sec{margin-top:18px}
+.share-card{position:relative;max-width:520px;margin:12px auto 0;border-radius:28px;padding:26px 24px 20px;overflow:hidden;color:#fff;background:radial-gradient(circle at 85% 8%,rgba(255,154,90,.35),transparent 45%),radial-gradient(circle at 10% 95%,rgba(82,199,255,.28),transparent 50%),linear-gradient(160deg,#17104a,#0b0b2b 70%);border:1px solid rgba(255,255,255,.28);box-shadow:0 20px 60px -20px rgba(138,107,255,.7)}
+.share-card::before{content:"";position:absolute;inset:0;background:radial-gradient(1.5px 1.5px at 12% 20%,#fff,transparent),radial-gradient(1.2px 1.2px at 70% 12%,#fff,transparent),radial-gradient(1.5px 1.5px at 88% 55%,#fff,transparent),radial-gradient(1px 1px at 30% 70%,#fff,transparent),radial-gradient(1.3px 1.3px at 55% 88%,#fff,transparent);opacity:.7;pointer-events:none}
+.sc-brand{font-size:.85rem;letter-spacing:.12em;color:#d9d4ff;position:relative}
+.sc-pct{font-family:var(--serif);font-weight:900;font-size:clamp(3.6rem,18vw,5.4rem);line-height:1.05;margin:6px 0 2px;background:linear-gradient(90deg,#ffd27a,#ff8aa8,#8aa0ff,#5ed0ff);-webkit-background-clip:text;background-clip:text;color:transparent;position:relative}
+.sc-pct small{font-size:.4em}
+.sc-lab{font-size:.85rem;color:#cfcaf5;position:relative}
+.sc-foot{margin-top:16px;font-size:.78rem;color:#cfcaf5;position:relative;border-top:1px dashed rgba(255,255,255,.25);padding-top:10px}
+.sh-acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.sh-msg{text-align:center;margin-top:10px;min-height:1.4em;font-weight:700}
+.sh-msg.err{color:#ffc0cc}.sh-msg.ok{color:#8dffbf}
+.sh-ta{display:block;width:100%;max-width:520px;margin:10px auto 0;min-height:150px;border-radius:16px;border:1px solid var(--line);background:#12123a;color:#fff;padding:12px 14px;font:inherit;line-height:1.7}
+.sh-prev{display:block;max-width:min(100%,360px);margin:14px auto 0;border-radius:18px;border:1px solid var(--line)}
+.explore{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.explore .btn{flex:1 1 200px;justify-content:center}
+
+
+/* SUMMARY + NEW SHARE CARD */
+.sum-sec{margin-top:14px}
+.sum-box{margin-top:10px;animation:viewIn .45s both}
+.sum-box p{margin:8px 0;font-size:1.02rem}
+.sum-note{margin:10px 0 0;font-size:.85rem;color:var(--mute);border-top:1px dashed var(--line);padding-top:8px}
+.share-card .sc-const{position:absolute;right:14px;top:12px;width:130px;opacity:.9;pointer-events:none}
+.sc-brand span{font-size:.78rem;letter-spacing:.06em;color:#cfcaf5}
+.sc-brand{line-height:1.4}
+.sc-signs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;position:relative}
+.sc-sign{text-align:center;min-width:0}
+.sc-g{font-size:clamp(2.4rem,11vw,3.4rem);line-height:1.1;color:var(--b);filter:drop-shadow(0 0 12px var(--a));font-family:"Segoe UI Symbol","Noto Sans Symbols","Noto Sans Symbols 2","Apple Symbols",var(--sans)}
+.sc-sign.none .sc-g{color:rgba(255,255,255,.35);filter:none}
+.sc-l{font-size:.8rem;color:#cfcaf5}
+.sc-n{font-family:var(--serif);font-weight:900;font-size:clamp(.95rem,4.2vw,1.2rem);overflow-wrap:anywhere}
+.sc-sign.none .sc-n{color:rgba(255,255,255,.65);font-weight:700}
+.share-card .sc-lab{margin-top:18px;text-align:center}
+.share-card .sc-pct{text-align:center;margin-top:0}
+.sc-tag{text-align:center;font-family:var(--serif);font-weight:700;font-size:1.05rem;position:relative;overflow-wrap:anywhere}
+.sc-el{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:12px;position:relative;font-size:.82rem;color:#cfcaf5}
+.el-badge{padding:3px 12px;border-radius:99px;background:linear-gradient(120deg,var(--a),var(--b));color:#10102a;font-weight:700}
+.sc-inv{position:relative;text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.28);font-family:var(--serif);font-weight:700;color:#ffe9b8;overflow-wrap:anywhere}
+.share-card .sc-foot{text-align:center;margin-top:8px;border-top:0;padding-top:0}
+.sh-hint{text-align:center;font-size:.85rem;color:var(--mute);margin:8px 0 0}
+
+/* MIXER */
+.mix-ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:10px}
+.sel{border:1px solid var(--line);border-radius:20px;padding:14px 16px;background:var(--glass);backdrop-filter:blur(8px)}
+.sel label{display:block;font-weight:700;margin-bottom:8px}
+.sel select{width:100%;padding:11px 12px;border-radius:12px;background:#12123a;color:#fff;border:1px solid var(--line);font:inherit}
+.sel .pick{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px}
+.sel .pick button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:1.15rem;line-height:1;color:var(--b);transition:.2s;font-family:"Segoe UI Symbol","Noto Sans Symbols","Noto Sans Symbols 2","Apple Symbols",var(--sans)}
+.sel .pick button:hover{transform:scale(1.18);background:var(--a);color:#10102a}
+.sel .pick button[aria-pressed="true"]{background:linear-gradient(120deg,var(--a),var(--b));color:#10102a;border-color:transparent}
+.mix-res{margin-top:22px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tcol{border:1px solid var(--line);border-radius:24px;padding:20px;background:linear-gradient(170deg,color-mix(in srgb,var(--a) 26%,transparent),rgba(255,255,255,.03) 60%),rgba(14,14,43,.6);backdrop-filter:blur(12px);animation:viewIn .5s both}
+.tcol .pos{font-size:.85rem;color:var(--mute);letter-spacing:.08em}
+.tcol h3{font-family:var(--serif);font-size:1.45rem;margin:2px 0 6px;display:flex;gap:10px;align-items:center}
+.tcol h3 .g{color:var(--b);font-size:2rem;filter:drop-shadow(0 0 10px var(--a));font-family:"Segoe UI Symbol","Noto Sans Symbols","Noto Sans Symbols 2","Apple Symbols",var(--sans)}
+.tcol dl{margin:12px 0 0}
+.tcol dt{font-weight:700;color:var(--b);font-size:.88rem;margin-top:10px}
+.tcol dd{margin:2px 0 0;font-size:.93rem}
+.tcol .more{margin-top:14px}
+.insight{margin-top:18px}
+.verdict{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.v-pill{padding:5px 14px;border-radius:999px;border:1px solid var(--line);background:var(--glass);font-weight:700}
+.share-box{margin-top:16px;position:relative}
+pre.share{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-family:var(--sans);margin:8px 0;font-size:.92rem}
+.toast{position:fixed;left:50%;bottom:26px;translate:-50% 30px;background:#fff;color:#10102a;padding:10px 20px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:.35s;z-index:60}
+.toast.on{opacity:1;translate:-50% 0}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:28px 20px 40px;text-align:center;color:var(--mute);font-size:.9rem;background:rgba(7,7,24,.6)}
+footer .disc{max-width:720px;margin:0 auto 8px;color:#e1deff}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;padding-top:22px;min-height:0}
+  .trio{grid-template-columns:1fr}
+  .d-hero{grid-template-columns:1fr;text-align:center;justify-items:center}
+  .d-hero .tags{justify-content:center}
+}
+@media (max-width:520px){
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .card{padding:14px 12px;min-height:200px}
+  .card .g{font-size:2.4rem}
+  .card h3{font-size:1.1rem}
+  .top-in{padding:8px 12px}
+  main{padding:0 14px 50px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .card{transform:none!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#app">跳到主要內容</a>
+<canvas id="stars" aria-hidden="true"></canvas>
+<header class="top">
+  <div class="top-in">
+    <a class="logo" href="#/" aria-label="回到首頁"><i aria-hidden="true">✦</i>星空小宇宙</a>
+    <nav class="top-nav" aria-label="主選單">
+      <a class="nav-btn" href="#/" data-nav="home">🪐 星盤</a>
+      <a class="nav-btn" href="#/mix" data-nav="mix">🎴 Big Three 組合器</a>
+      <a class="nav-btn" href="#/elements" data-nav="elements">🔥 元素與模式</a>
+      <a class="nav-btn" href="#/checklist" data-nav="checklist">📝 自我觀察清單</a>
+      <button class="nav-btn" id="rand" type="button">🎲 抽一個</button>
+    </nav>
+  </div>
+</header>
+<main id="app" tabindex="-1"></main>
+<footer>
+  <p class="disc" id="foot-disc"></p>
+  <p>資料來源：Notion 研究專案「星座與性格關聯研究」· Chapter 1</p>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = {"project": "星座與性格關聯研究", "source": "Notion · Chapter 1：核心基礎與 Big Three", "guide": {"intro": "這個 Chapter 是整個專案的核心基礎，涵蓋占星中最常用、最直接影響「性格描述」的部分。以下內容整合傳統西方占星的主流描述，以描述性整理為主，並非科學因果聲稱。", "elements": [{"key": "火", "name": "火象（Fire）", "signs": ["aries", "leo", "sagittarius"], "desc": "熱情、行動力、自發性、勇氣、創意。傾向即時反應、追求刺激與自我表達。", "pro": "感染力與領導力", "con": "衝動、不耐煩、容易 burnout"}, {"key": "土", "name": "土象（Earth）", "signs": ["taurus", "virgo", "capricorn"], "desc": "務實、穩定、感官、耐心、建構力。重視實際結果、安全感與持久性。", "pro": "可靠與落地", "con": "固執、抗拒改變、過度物質導向"}, {"key": "風", "name": "風象（Air）", "signs": ["gemini", "libra", "aquarius"], "desc": "理性、溝通、社交、概念、適應性。以思想與關係為中心，喜歡交流與新觀點。", "pro": "靈活與客觀", "con": "漂浮、表面、情緒抽離"}, {"key": "水", "name": "水象（Water）", "signs": ["cancer", "scorpio", "pisces"], "desc": "情感、直覺、同理心、深度、保護性。對情緒與潛意識敏感。", "pro": "同理與韌性", "con": "情緒化、過度敏感、容易退縮或逃避"}], "yinyang": "火與風屬「陽／主動」，土與水屬「陰／接受」。", "modes": [{"key": "本位 Cardinal", "name": "本位（Cardinal）＝啟動能量", "signs": ["aries", "cancer", "libra", "capricorn"], "desc": "發起者。喜歡開始新事物、帶頭、創造動量。對應季節開始，象徵新循環的第一推力。", "real": "主動提出計劃、快速行動、帶領別人進入新階段", "pro": "領導力、主動、有開創力", "con": "可能開了頭就失去興趣、過度主導、難堅持到底、自我中心"}, {"key": "固定 Fixed", "name": "固定（Fixed）＝維持與深化能量", "signs": ["taurus", "leo", "scorpio", "aquarius"], "desc": "穩定者。堅持、深化、維持現狀。對應季節中段，負責「穩住」與「加深」。", "real": "一旦認定方向就很難改變、對人對事忠誠持久、有耐力完成長期目標", "pro": "毅力、忠誠、深度、可靠", "con": "容易變得僵化、抗拒任何改變、固執"}, {"key": "變動 Mutable", "name": "變動（Mutable）＝適應與轉換能量", "signs": ["gemini", "virgo", "sagittarius", "pisces"], "desc": "適應者。靈活、轉換、處理過渡。對應季節結束，負責「過渡」與「整合」。", "real": "容易適應新環境、同時處理多件事、思維靈活", "pro": "適應力、多才多藝、彈性高", "con": "可能顯得善變、難以做最終決定或堅持到底、注意力分散"}], "modeNote": "元素決定「什麼」，模式決定「怎麼做」。三者形成自然循環：開始（本位）→ 穩定（固定）→ 調整／結束（變動）→ 再開始。", "bigThree": [{"pos": "太陽", "icon": "☀️", "meaning": "核心身份與意志", "q": "「我是誰？我往哪裡走？」"}, {"pos": "月亮", "icon": "🌙", "meaning": "內在情緒與需求", "q": "「我感覺什麼？我需要什麼才安全？」"}, {"pos": "上升", "icon": "⬆️", "meaning": "外在呈現與第一反應", "q": "「別人怎麼看我？我怎麼進入世界？」"}], "priority": [["三者元素是否一致", "元素一致時，能量流動較順暢；元素衝突時，常產生內在張力與豐富度。"], ["太陽與上升的落差", "這決定「面具」與「真實自我」之間的距離。落差大時，別人第一眼看到的，可能與本人真實感受差異明顯。"], ["月亮與太陽／上升的配合", "月亮決定情緒是否支援核心意志，以及外在表現是否能真正安撫內在需求。"], ["整體模式平衡", "觀察本位、固定、變動的分佈，可看出一個人傾向「開啟」、「維持」還是「調整」。"]], "combos": [["全部火象", "直接、熱情、行動導向，但可能缺乏耐心與深度沉澱。"], ["土太陽 + 水月亮 + 風上升", "外表輕盈社交、核心務實、內在情感豐富，常見「看起來好相處，實際很有自己的節奏與感受」。"], ["火太陽 + 土月亮 + 水上升", "意志強烈，但情緒需要穩定與安全感，外在可能顯得較柔和或敏感。"], ["風太陽 + 火月亮 + 土上升", "思緒活躍，情緒反應快，但外在表現較沉穩踏實。"]], "comboNote": "解讀時不必追求「完美一致」。張力本身往往帶來成長與立體感。", "disclaimer": "以上與資料庫內容皆為傳統占星描述性整理，用作自我反思框架，而非命運決定論。", "dateNote": "各星座日期範圍為方便瀏覽而加入的通用參考（Notion 資料庫未記錄），實際以星曆為準。"}, "signs": [{"slug": "aries", "zh": "白羊座", "en": "Aries", "glyph": "♈", "dates": "03/21 – 04/19", "element": "火", "mode": "本位 Cardinal", "sun": {"name": "白羊座 Aries", "element": "火", "mode": "本位 Cardinal", "keywords": "開創、勇氣、直接、衝動、領導、生命力", "positive": "熱情、勇敢、主動、誠實、有衝勁、開創精神、獨立、行動力強。白羊人通常是第一個提出「不如試試看？」的人，面對新機會會立刻衝出去。", "shadow": "衝動、不耐煩、自我中心、易發脾氣、缺乏耐心、魯莽、容易半途而廢。壓力下可能變成爭強好勝或無視他人感受。", "emotion": "情緒來得快、去得也快。生氣時可能立刻爆發，但通常不會記仇太久。興奮時整個世界都覺得充滿可能。", "communication": "坦率、直接、不拐彎抹角。說話快，有時顯得唐突或命令式，但通常出自真心而非惡意。", "decision": "快速決策、先做再想。喜歡挑戰與新開始，討厭拖泥帶水。現實例子：看到新計劃立刻報名、主動組織活動、或者突然轉職轉城市。", "stress": "容易焦躁、好鬥，或以大量行動發洩（運動、加班、爭辯）。也可能突然消失去「冷靜」。", "summary": "白羊是十二星座的開端，火象＋本位，由火星統治。核心主題是「我行動、我開創」。\n\n現實中常見樣貌：\n- 工作上：喜歡帶頭開新項目、做銷售、創業、或任何需要勇氣與速度的崗位。\n- 生活上：可能是朋友圈第一個試新餐廳、報旅行團、或衝動買機票的人。\n- 關係上：追求時直接熱情，但可能缺乏耐心慢慢經營。\n\n白羊能量的本質是「生命力向外爆發」。當健康時，他們是推動世界前進的火花；當失衡時，就容易變成只顧自己衝、忽略後果。理解白羊，重點不是「衝動」這個標籤，而是他們天生對「開始」有強烈慾望。"}, "moon": {"name": "白羊月亮 Moon in Aries", "element": "火", "need": "需要立即行動、自主與刺激。情緒上渴望被挑戰、被認可自己的獨立與勇氣。需要空間去直接表達感受，不喜歡被壓抑或拖延。\n\n現實中常見：情緒不舒服時會想立刻做點什麼（運動、出門、爭論、開始新計劃），而不是坐下來慢慢談。", "security": "來自能夠自己做主、快速解決問題、以及被允許直接表達需求。穩定的日常反而可能讓他們感到沉悶不安。有挑戰與進展時最有安全感。", "expression": "情緒來得快、反應直接。生氣時可能立刻爆發，開心時也很熱烈。情緒週期短，恢復也相對快。傾向用行動來處理情緒，而不是長時間沉浸。\n\n常見表現：心情不好會直接說出來或用行動表現，很少會悶很久。", "shadow": "衝動發脾氣、缺乏耐心、容易感到無聊、把情緒變成攻擊性、難以處理需要緩慢醞釀的情感。可能在關係中顯得急躁或不夠體貼對方的節奏。", "withSun": "若太陽也是火象，情緒與意志高度一致，行動力極強但可能過於急躁。若太陽是土或水象，月亮會推動太陽更果斷，但也可能產生「想快」與「想穩／想感受」的內在拉扯。\n\n簡要總結：白羊月亮的人內在是「情緒戰士」。他們需要被允許快速行動與表達，才能感覺安全與活著。理解他們的關鍵是接受其直接與快速的情緒節奏，而不是要求他們慢慢來。"}, "rising": {"name": "白羊上升 Aries Rising", "element": "火", "aura": "直接、充滿活力、行動導向，具有明顯衝勁。身體語言明確，步伐較快，予人「已準備好採取行動」之感。", "first": "勇敢、獨立，偶爾顯得強勢或急躁。他人常感知其主見鮮明、不拖泥帶水，甚或帶有壓迫感。", "social": "主動、直接，偏好主導話題或活動。不傾向拐彎抹角，喜歡迅速進入重點。在新環境中較容易快速展現存在感。", "gap": "若太陽屬於水象或土象，外在表現可能較內在更為果斷與急切，他人所感知的「衝勁」與真實感受之間，可能產生落差。\n若太陽屬於風象，外在的直接行動與內在的思考流動，可能形成節奏上的差異。\n若太陽同屬火象，外在與內在的能量方向較為一致，整體呈現強烈的行動力與表達力。\n\n簡要總結：白羊上升給人的第一印象為「直接的行動者」。其進入世界的方式，是以主動與速度為基礎。理解此上升的關鍵，在於接受其直接風格，並給予開啟事物的空間。"}}, {"slug": "taurus", "zh": "金牛座", "en": "Taurus", "glyph": "♉", "dates": "04/20 – 05/20", "element": "土", "mode": "固定 Fixed", "sun": {"name": "金牛座 Taurus", "element": "土", "mode": "固定 Fixed", "keywords": "穩定、感官、忠誠、固執、實際、安全感", "positive": "可靠、耐心、忠誠、務實、享受感官樂趣、堅持到底。金牛人通常是你可以長期依靠的人，一旦承諾就很認真。", "shadow": "固執、佔有慾強、抗拒改變、物質主義、懶散、緩慢。改變對他們來說很辛苦，可能拖到最後一刻。", "emotion": "慢熱、穩定。情緒不會大起大落，但一旦動怒或受傷，會記很久。需要安全感與舒適才放鬆。", "communication": "實際、緩慢、重感覺與具體細節。不喜歡空談，寧願講「怎麼做到」而不是「可能怎樣」。", "decision": "深思熟慮、緩慢但堅定。喜歡看得見、摸得到的結果。現實例子：買房、投資、慢慢建立事業或收藏，很少衝動決定。", "stress": "變得更固執，或者退回自己的舒適圈（吃好東西、宅在家裡、拒絕新計劃）。", "summary": "金牛是土象＋固定，由金星統治。核心主題是「我擁有、我享受、我穩定」。\n\n現實中常見樣貌：\n- 工作上：適合需要耐心與持續力的崗位（財務、設計、餐飲、地產、手工藝）。\n- 生活上：重視吃、住、身體感覺，可能是會花時間煮好菜、佈置家裡、或慢慢存錢的人。\n- 關係上：忠誠但佔有，需要時間建立信任，一旦信任就很穩。\n\n金牛能量的本質是「落地與持久」。當健康時，他們是生活的穩定力量；當失衡時，就容易變成抗拒任何流動。理解金牛，重點是他們對「安全感」與「感官滿足」有很深的需求。"}, "moon": {"name": "金牛月亮 Moon in Taurus", "element": "土", "need": "需要穩定、舒適、感官滿足與可預期的安全感。情緒上渴望被好好照顧、被滋養，以及擁有實際、摸得到的安全感（金錢、食物、身體舒適、穩定關係）。", "security": "來自固定的日常、舒服的環境、被穩定對待、以及感官上的愉悅（好吃的、舒服的觸感、美麗的事物）。突然的改變會讓他們不安。", "expression": "情緒緩慢、穩定、持久。不會輕易大起大落，但一旦動怒或受傷，會持續很久。傾向用身體感受與日常習慣來安撫自己。", "shadow": "過度依賴舒適、抗拒改變、佔有慾、懶散、把情緒悶在心裡很久、對改變產生強烈防衛。", "withSun": "若太陽是火或風象，月亮會提供接地與穩定，幫助太陽不那麼飄或急。若太陽也是土象，整體非常穩重但可能過於固執。若太陽是水象，情感更深但節奏偏慢。\n\n簡要總結：金牛月亮的人內在是「需要被好好養育的穩定力量」。他們透過身體與日常的穩定來感覺安全。理解他們的關鍵是給時間、給穩定，不要急著改變他們的節奏。"}, "rising": {"name": "金牛上升 Taurus Rising", "element": "土", "aura": "沉穩、踏實，具有感官與美感特質。動作較為緩慢而有力，予人可靠、舒適、不易被催促之感。", "first": "穩定、具耐性、務實，偶爾顯得固執或慢熱。他人常感知其穩重、值得依靠。", "social": "節奏從容，重視實質互動。偏好於舒適環境中交流，較少主動開啟過多新關係，一旦建立連結則相當穩定。", "gap": "若太陽屬於火象或風象，外在表現可能較內在更為沉穩與緩慢，他人所感知的「穩定」與真實的急切或思緒流動之間，可能產生落差。\n若太陽屬於水象，外在的穩定特質與內在的情感敏感，可能形成節奏上的差異。\n若太陽同屬土象，外在與內在的能量方向較為一致，整體呈現踏實而持久的特質。\n\n簡要總結：金牛上升給人的第一印象為「可靠的穩定者」。其進入世界的方式，是以踏實與感官舒適為基礎。理解此上升的關鍵，在於給予充分時間，避免催促。"}}, {"slug": "gemini", "zh": "雙子座", "en": "Gemini", "glyph": "♊", "dates": "05/21 – 06/20", "element": "風", "mode": "變動 Mutable", "sun": {"name": "雙子座 Gemini", "element": "風", "mode": "變動 Mutable", "keywords": "好奇、溝通、多變、機智、適應、資訊", "positive": "聰明、健談、好奇、適應力強、幽默、學習快、社交靈活。雙子人通常是房間裡最容易跟人聊天、帶動氣氛的人。", "shadow": "善變、表面、注意力分散、口是心非、坐立不安、難以深入。可能同時開始太多事情，最後無一完成。", "emotion": "透過說話與思考處理情緒。情緒變化快，可能上一秒開心下一秒無聊。需要心智刺激才感覺活著。", "communication": "活潑、資訊豐富、愛聊天與分享想法。說話快、跳躍式，有時讓人跟不上。", "decision": "靈活多變，喜歡同時處理多件事。現實例子：同時做幾份兼職、不斷轉興趣、或是社群媒體與訊息的中心。", "stress": "坐立不安、過度思考、逃避到新刺激或不斷轉換話題。", "summary": "雙子是風象＋變動，由水星統治。核心主題是「我思考、我溝通、我連接資訊」。\n\n現實中常見樣貌：\n- 工作上：適合需要溝通與變化的崗位（媒體、銷售、教學、寫作、客服、活動策劃）。\n- 生活上：可能是朋友圈的資訊中心，喜歡認識新朋友、學新技能、或同時追蹤多個興趣。\n- 關係上：需要心智連結，沉悶是最大敵人，可能顯得善變。\n\n雙子能量的本質是「流動與交流」。當健康時，他們是資訊與連結的橋樑；當失衡時，就容易變得分散與缺乏深度。理解雙子，重點是他們對「新鮮感」與「心智刺激」有強烈需求。"}, "moon": {"name": "雙子月亮 Moon in Gemini", "element": "風", "need": "需要心智刺激、交流、變化與被理解。情緒上渴望透過說話、思考、分享資訊來處理感受。需要自由流動的想法與社交互動。", "security": "來自能夠自由表達想法、有人可以聊天、環境有新鮮感。被困在單一情緒或無聊環境會讓他們焦慮。", "expression": "透過說話與思考來處理情緒。情緒變化快，可能上一秒還在開心，下一秒就轉移話題。傾向把感受理性化或用幽默化解。", "shadow": "情緒過於理智化、難以深入感受、注意力分散、用不斷說話或轉換話題來逃避真正的情緒、顯得善變或不夠穩定。", "withSun": "若太陽是土或水象，月亮會讓人更靈活、更會表達，但也可能造成內在「想深」與「想快換」的衝突。若太陽是風或火象，整體非常活躍、社交導向。\n\n簡要總結：雙子月亮的人內在是「需要透過交流來感覺安全的思緒」。他們用說話與變化來安撫情緒。理解他們的關鍵是給他們空間說話、給新鮮感，而不是要求他們一直停留在同一種情緒裡。"}, "rising": {"name": "雙子上升 Gemini Rising", "element": "風", "aura": "靈活、好奇、反應迅速，具有輕快與多變的氣息。表情與手勢豐富，予人「隨時準備聊天或接收新資訊」之感。", "first": "聰明、健談、有趣，偶爾顯得坐立不安或難以捉摸。他人常感知其容易親近、話題豐富。", "social": "主動交流，喜歡分享資訊，能適應不同場合。可能同時與多人保持輕鬆連結，較不偏好過於沉重或單一的互動。", "gap": "若太陽屬於土象或水象，外在表現可能較內在更為輕快與多變，他人所感知的「活潑」與真實的穩定或深度之間，可能產生落差。\n若太陽屬於火象，外在的靈活交流與內在的直接行動，可能形成節奏上的差異。\n若太陽同屬風象，外在與內在的能量方向較為一致，整體呈現好奇與善於交流的特質。\n\n簡要總結：雙子上升給人的第一印象為「靈活的交流者」。其進入世界的方式，是以好奇與對話為基礎。理解此上升的關鍵，在於給予新鮮感與談話空間。"}}, {"slug": "cancer", "zh": "巨蟹座", "en": "Cancer", "glyph": "♋", "dates": "06/21 – 07/22", "element": "水", "mode": "本位 Cardinal", "sun": {"name": "巨蟹座 Cancer", "element": "水", "mode": "本位 Cardinal", "keywords": "情感、保護、直覺、家庭、敏感、歸屬", "positive": "體貼、有同理心、保護性強、直覺敏銳、忠誠於家人與親密圈。巨蟹人通常是會記得你生日、關心你有沒有吃飯的人。", "shadow": "情緒化、過度保護、記仇、退縮、不安全感、依賴。可能把過去的傷害帶到現在。", "emotion": "深厚、情緒化，容易受周圍氣氛影響。需要安全感與被接納才放得開。", "communication": "感性、間接，重視情感連結多過邏輯。可能用暗示多過直接說。", "decision": "以感覺與安全感為優先，重視歸屬與家庭。現實例子：為家人做決定、重視家裡佈置、或工作選擇以穩定與人情為重。", "stress": "退縮到殼裡、情緒波動、或過度照顧他人而忽略自己。", "summary": "巨蟹是水象＋本位，由月亮統治。核心主題是「我感覺、我保護、我歸屬」。\n\n現實中常見樣貌：\n- 工作上：適合需要同理與照顧的崗位（教育、護理、餐飲、人力資源、輔導）。\n- 生活上：可能是朋友／家人的情感支柱，重視傳統、回憶與溫暖空間。\n- 關係上：一旦認定就很忠誠，但需要大量安全感，可能顯得黏人或情緒敏感。\n\n巨蟹能量的本質是「情感滋養與保護」。當健康時，他們是溫暖的港灣；當失衡時，就容易陷入情緒漩渦或過度防衛。理解巨蟹，重點是他們對「安全感」與「被需要」有很深層的需求。"}, "moon": {"name": "巨蟹月亮 Moon in Cancer", "element": "水", "need": "需要情感安全、被保護、歸屬感與親密連結。情緒上極度敏感，渴望被溫柔對待、被理解情緒，以及擁有可以退縮的「殼」。", "security": "來自親密的人、熟悉的環境、被情緒接納、以及能夠照顧或被照顧的感覺。家庭與情感連結是最大的安全感來源。", "expression": "情緒深厚、敏感、容易受周圍氣氛影響。可能表現出照顧他人、或突然退縮。情緒記憶力很強，過去的傷害容易被重新觸發。", "shadow": "過度敏感、情緒化、記仇、黏人、退縮到殼裡不願面對、把過去的傷痛投射到現在關係中。", "withSun": "若太陽是火或風象，月亮會帶來深度情感與敏感，可能產生「外表強勢／理性，內在脆弱」的落差。若太陽是水或土象，情感表達更一致，但可能過於沉浸在情緒中。\n\n簡要總結：巨蟹月亮是月亮的本位，情緒能量最強烈。他們內在是「需要被溫柔保護的情感核心」。理解他們的關鍵是給情緒空間、給穩定的關愛，不要輕忽他們的感受。"}, "rising": {"name": "巨蟹上升 Cancer Rising", "element": "水", "aura": "柔和、具保護性，帶有情感與敏感的氣息。表情豐富，予人「容易接近、略帶警戒卻又溫暖」之感。", "first": "體貼、敏感，偶爾顯得害羞或情緒化。他人常感知其善於照顧人，或容易受傷。", "social": "重視情感連結，偏好在熟悉的小圈中互動。可能先觀察再敞開，一旦建立信任便相當保護對方。", "gap": "若太陽屬於火象或風象，外在表現可能較內在更為敏感、更需要安全感，他人所感知的「溫柔」與真實的直接或獨立之間，可能產生落差。\n若太陽屬於土象，外在的情感敏感與內在的務實穩定，可能形成節奏上的差異。\n若太陽同屬水象，外在與內在的情感能量較為一致，整體呈現敏感而具保護性的特質。\n\n簡要總結：巨蟹上升給人的第一印象為「有保護欲的情感者」。其進入世界的方式，是以敏感與照顧為基礎。理解此上升的關鍵，在於給予安全感與溫柔。"}}, {"slug": "leo", "zh": "獅子座", "en": "Leo", "glyph": "♌", "dates": "07/23 – 08/22", "element": "火", "mode": "固定 Fixed", "sun": {"name": "獅子座 Leo", "element": "火", "mode": "固定 Fixed", "keywords": "自信、創造、戲劇、慷慨、光芒、認可", "positive": "自信、慷慨、有創造力、忠誠、溫暖、有領導魅力。獅子人通常是會讓房間亮起來、願意分享資源與讚美的人。", "shadow": "自我中心、愛面子、戲劇化、需要被關注、傲慢、難以接受批評。", "emotion": "熱情外放，需要被看見與欣賞。開心時像太陽，受傷時可能大動作表達。", "communication": "戲劇性、自信、有感染力。說話有氣勢，喜歡成為焦點。", "decision": "以自我表達與認可為驅動力。現實例子：主動組織派對、表演、領導團隊，或在社群媒體分享生活。", "stress": "更誇張表現自己，或變得防衛、受傷、需要大量肯定。", "summary": "獅子是火象＋固定，由太陽統治。核心主題是「我創造、我閃耀、我被看見」。\n\n現實中常見樣貌：\n- 工作上：適合需要舞台與創造力的崗位（表演、管理、設計、銷售、活動主持）。\n- 生活上：可能是朋友圈的中心人物，喜歡大方請客、慶祝、或追求個人風格。\n- 關係上：慷慨忠誠，但需要被欣賞，可能顯得戲劇化。\n\n獅子能量的本質是「生命力向外發光」。當健康時，他們是溫暖與鼓舞他人的存在；當失衡時，就容易變成只求關注。理解獅子，重點是他們對「被認可」與「自我表達」有強烈需求。"}, "moon": {"name": "獅子月亮 Moon in Leo", "element": "火", "need": "需要被看見、被欣賞、被讚美，以及有舞台可以表達自己。情緒上渴望成為焦點、被認可自己的獨特性與創造力。", "security": "來自被肯定、被關注、有機會展現自己。被忽視或被批評會嚴重打擊安全感。", "expression": "情緒外放、戲劇性、熱情。開心時像太陽一樣照亮周圍，受傷時可能大動作表達或需要大量安慰。", "shadow": "過度需要關注、情緒戲劇化、難以接受批評、把情緒變成表演、在不被看見時感到強烈失落。", "withSun": "若太陽也是火象，整體非常有魅力與表現欲。若太陽是土或水象，可能產生「內在渴望被看見，但外表較收斂」的張力。\n\n簡要總結：獅子月亮的人內在是「需要被欣賞的表演者」。他們透過被看見與被肯定來感覺安全。理解他們的關鍵是真誠的讚美與給予舞台，而不是忽視他們的存在。"}, "rising": {"name": "獅子上升 Leo Rising", "element": "火", "aura": "具有存在感、自信，帶有光芒與戲劇性。容易吸引目光，予人「很有個人風格、喜歡被注意」之感。", "first": "熱情、有魅力、自信，偶爾顯得愛表現或需要關注。他人常感知其氣場強大。", "social": "自然成為焦點，喜歡分享自己，對他人慷慨。可能在社交中展現領導或表演特質。", "gap": "若太陽屬於土象或水象，外在表現可能較內在更為外放、更需要被看見，他人所感知的「閃耀」與真實的內斂或敏感之間，可能產生落差。\n若太陽屬於風象，外在的光芒表現與內在的思考流動，可能形成節奏上的差異。\n若太陽同屬火象，外在與內在的能量方向較為一致，整體呈現自信而富有表現力的特質。\n\n簡要總結：獅子上升給人的第一印象為「有光芒的表達者」。其進入世界的方式，是以自信與存在感為基礎。理解此上升的關鍵，在於給予肯定與舞台。"}}, {"slug": "virgo", "zh": "處女座", "en": "Virgo", "glyph": "♍", "dates": "08/23 – 09/22", "element": "土", "mode": "變動 Mutable", "sun": {"name": "處女座 Virgo", "element": "土", "mode": "變動 Mutable", "keywords": "分析、服務、完美、實用、細節、改善", "positive": "細心、務實、有分析力、樂於助人、追求改善、負責任。處女人通常是會幫你檢查細節、提出實用建議的人。", "shadow": "吹毛求疵、過度批判、焦慮、完美主義、自我貶低、難以放鬆。", "emotion": "內斂，透過解決問題或服務來處理情緒。焦慮時可能過度工作或挑剔。", "communication": "精確、有條理、注重細節與實用。喜歡指出問題並提出改善方案。", "decision": "謹慎分析、追求效率與完美。現實例子：做計劃表、優化流程、或幫人整理與解決實際問題。", "stress": "過度工作、挑剔自己與他人、陷入焦慮循環。", "summary": "處女是土象＋變動，由水星統治。核心主題是「我分析、我完善、我服務」。\n\n現實中常見樣貌：\n- 工作上：適合需要細心與系統的崗位（編輯、會計、醫療、行政、研究、品質管理）。\n- 生活上：可能是會整理房間、做清單、或默默幫人解決麻煩的人。\n- 關係上：用實際行動表達關心，但可能過於挑剔。\n\n處女能量的本質是「精煉與實用」。當健康時，他們是讓事情變得更好的力量；當失衡時，就容易陷入永不滿足的完美主義。理解處女，重點是他們對「有用」與「改善」有強烈內在驅力。"}, "moon": {"name": "處女月亮 Moon in Virgo", "element": "土", "need": "需要秩序、有用、被需要、以及能夠改善事物的感覺。情緒上渴望透過服務、分析、整理來獲得安全感。", "security": "來自環境整潔、事情有條理、自己對他人有用、以及能夠掌控細節。混亂會讓他們極度不安。", "expression": "情緒較內斂，傾向用解決問題或幫助他人來處理感受。焦慮時可能變得挑剔或過度忙碌。", "shadow": "過度批判自己與他人、完美主義、用忙碌逃避情緒、把焦慮轉成挑剔、難以放鬆享受。", "withSun": "若太陽是火或風象，月亮會帶來實際與細心，幫助落地。若太陽也是土象，整體非常務實但可能過於嚴苛。\n\n簡要總結：處女月亮的人內在是「需要透過有用與秩序來感覺安全的分析者」。他們用改善與服務來安撫情緒。理解他們的關鍵是肯定他們的幫助，並溫柔提醒他們不必完美。"}, "rising": {"name": "處女上升 Virgo Rising", "element": "土", "aura": "乾淨、細心、有條理，帶有實用與服務的氣息。予人「善於注意細節、可靠、略帶完美主義」之感。", "first": "認真、樂於助人，偶爾顯得挑剔或緊張。他人常感知其善於做事、負責任。", "social": "以實用與幫助為主，可能先觀察再提供建議。不偏好混亂或缺乏效率的互動。", "gap": "若太陽屬於火象或風象，外在表現可能較內在更為謹慎、更注重細節，他人所感知的「細心」與真實的衝動或思緒流動之間，可能產生落差。\n若太陽屬於水象，外在的實用細心與內在的情感敏感，可能形成節奏上的差異。\n若太陽同屬土象，外在與內在的能量方向較為一致，整體呈現務實而注重完善的特質。\n\n簡要總結：處女上升給人的第一印象為「實用的完善者」。其進入世界的方式，是以細心與服務為基礎。理解此上升的關鍵，在於肯定其幫助，並接受其對細節的在意。"}}, {"slug": "libra", "zh": "天秤座", "en": "Libra", "glyph": "♎", "dates": "09/23 – 10/22", "element": "風", "mode": "本位 Cardinal", "sun": {"name": "天秤座 Libra", "element": "風", "mode": "本位 Cardinal", "keywords": "平衡、和諧、關係、美感、猶豫、公平", "positive": "有魅力、公平、社交能力強、追求和諧、有審美、善於協調。天秤人通常是會讓氣氛變得舒服、幫人調停的人。", "shadow": "優柔寡斷、討好他人、迴避衝突、表面、難以做決定。", "emotion": "重視關係中的平衡，不喜歡尖銳情緒。可能壓抑自己感受去維持和諧。", "communication": "圓滑、外交、注重對方感受。說話有禮貌，避免直接衝突。", "decision": "權衡利弊、尋求共識，有時猶豫不決。現實例子：花很長時間比較選項、或為了不想得罪人而拖延決定。", "stress": "更猶豫、過度迎合、或突然爆發累積的不滿。", "summary": "天秤是風象＋本位，由金星統治。核心主題是「我平衡、我連結、我追求和諧」。\n\n現實中常見樣貌：\n- 工作上：適合需要協調與美感的崗位（設計、法律、公關、人力資源、諮詢、藝術）。\n- 生活上：可能是朋友圈的和事佬，重視穿著、環境美觀、或社交禮儀。\n- 關係上：重視公平與陪伴，但可能為了避免衝突而委屈自己。\n\n天秤能量的本質是「關係與平衡」。當健康時，他們是連結與美化世界的力量；當失衡時，就容易失去自己。理解天秤，重點是他們對「和諧」與「被接納」有強烈需求。"}, "moon": {"name": "天秤月亮 Moon in Libra", "element": "風", "need": "需要和諧、公平、美、以及關係中的平衡。情緒上渴望被溫柔對待、有伴侶或親密連結、避免衝突。", "security": "來自和諧的關係、美的環境、被公平對待、以及有人陪伴。衝突或不平衡會讓他們強烈不安。", "expression": "重視關係中的平衡，不喜歡尖銳或激烈的情緒。可能壓抑自己感受去維持和諧，或透過美與社交來調節情緒。", "shadow": "過度討好、迴避衝突、優柔寡斷、把真實情緒藏起來、在關係中失去自己。", "withSun": "若太陽是火或土象，月亮會軟化太陽的直接或固執，帶來更多關係意識。若太陽是風或水象，整體更重視和諧與連結。\n\n簡要總結：天秤月亮的人內在是「需要和諧與美的關係者」。他們透過平衡與連結來感覺安全。理解他們的關鍵是給溫柔與公平，並鼓勵他們表達真實需求。"}, "rising": {"name": "天秤上升 Libra Rising", "element": "風", "aura": "優雅、和諧、有魅力，帶有平衡與美感。予人「善於與人互動、注重外表與氣氛」之感。", "first": "有禮貌、討人喜歡，偶爾顯得猶豫或迎合。他人常感知其善於聊天、維持和諧。", "social": "重視關係平衡，偏好一對一或小團體的和諧互動。擅長調停，可能避免直接衝突。", "gap": "若太陽屬於火象或土象，外在表現可能較內在更為圓滑、更注重和諧，他人所感知的「優雅」與真實的直接或務實之間，可能產生落差。\n若太陽屬於水象，外在的平衡追求與內在的情感敏感，可能形成節奏上的差異。\n若太陽同屬風象，外在與內在的能量方向較為一致，整體呈現重視關係與和諧的特質。\n\n簡要總結：天秤上升給人的第一印象為「追求和諧的連結者」。其進入世界的方式，是以優雅與平衡為基礎。理解此上升的關鍵，在於給予公平與美，並鼓勵真實表達。"}}, {"slug": "scorpio", "zh": "天蠍座", "en": "Scorpio", "glyph": "♏", "dates": "10/23 – 11/21", "element": "水", "mode": "固定 Fixed", "sun": {"name": "天蠍座 Scorpio", "element": "水", "mode": "固定 Fixed", "keywords": "深刻、轉化、神秘、熱情、控制、洞察", "positive": "有洞察力、忠誠、有決心、情感深厚、有轉化力、專注。天蠍人通常是會看穿表面、堅持到最後的人。", "shadow": "嫉妒、控制慾、報復心、秘密、極端、難以信任。", "emotion": "強烈、內斂，情緒深層且持久。不會輕易表露，但一旦爆發就很有力。", "communication": "直接但有保留，重視真實與深度。可能用沉默多過說話。", "decision": "一旦決定就全力以赴，不輕言放棄。現實例子：深入研究一個主題、長期經營關係、或徹底改變人生方向。", "stress": "變得封閉、操控、或激烈對抗。也可能用權力或秘密作為防衛。", "summary": "天蠍是水象＋固定，傳統由火星、現代由冥王星統治。核心主題是「我轉化、我深入、我掌控深度」。\n\n現實中常見樣貌：\n- 工作上：適合需要深度與韌性的崗位（研究、心理、調查、金融、危機處理、藝術創作）。\n- 生活上：可能是少數知心朋友、對興趣極度專注、或會經歷深刻人生轉變的人。\n- 關係上：一旦投入就很深，但需要高度信任，可能顯得佔有或神秘。\n\n天蠍能量的本質是「深度與轉化」。當健康時，他們是催生真正改變的力量；當失衡時，就容易陷入權力鬥爭或情緒黑洞。理解天蠍，重點是他們對「真實」與「情感強度」有強烈需求。"}, "moon": {"name": "天蠍月亮 Moon in Scorpio", "element": "水", "need": "需要深度、真實、情感強度與掌控感。情緒上渴望深刻的連結、被完全理解，以及能夠轉化痛苦。", "security": "來自深度信任的關係、能夠掌控自己的情緒世界、以及經歷過轉化後的力量感。表面或膚淺的互動會讓他們不安。", "expression": "情緒強烈、內斂、持久。不會輕易表露，但一旦投入就很深。傾向把情緒轉成洞察或權力動態。", "shadow": "嫉妒、控制、記仇、封閉自己、把情緒變成權力遊戲、難以信任、極端化感受。", "withSun": "若太陽是火或風象，月亮會帶來深度與強度，可能產生「外表輕鬆，內在很重」的落差。若太陽是水或土象，情感能量非常集中且有力。\n\n簡要總結：天蠍月亮的人內在是「需要深度與真實的情感煉金術士」。他們透過深刻連結與轉化來感覺安全。理解他們的關鍵是給真實與信任，不要停留在表面。"}, "rising": {"name": "天蠍上升 Scorpio Rising", "element": "水", "aura": "強烈、具磁性，帶有深度與神秘感。眼神或氣場常予人「不容易看穿、很有力量」之感。", "first": "深刻、有魅力，偶爾顯得防備或強烈。他人常感知其存在感強大，或難以親近。", "social": "傾向深度而非廣泛。可能先觀察許久才敞開，一旦建立信任便相當投入。不偏好表面社交。", "gap": "若太陽屬於火象或風象，外在表現可能較內在更為神秘、更強烈，他人所感知的「深度」與真實的直接或輕快之間，可能產生落差。\n若太陽屬於土象，外在的強度與內在的務實穩定，可能形成節奏上的差異。\n若太陽同屬水象，外在與內在的情感能量較為一致，整體呈現深刻而有力的特質。\n\n簡要總結：天蠍上升給人的第一印象為「有深度的觀察者」。其進入世界的方式，是以強度與神秘為基礎。理解此上升的關鍵，在於給予真實與建立信任的時間。"}}, {"slug": "sagittarius", "zh": "射手座", "en": "Sagittarius", "glyph": "♐", "dates": "11/22 – 12/21", "element": "火", "mode": "變動 Mutable", "sun": {"name": "射手座 Sagittarius", "element": "火", "mode": "變動 Mutable", "keywords": "自由、探索、樂觀、哲學、直接、意義", "positive": "樂觀、誠實、愛冒險、有哲學思維、慷慨、視野廣。射手人通常是會帶你去新地方、分享大道理的人。", "shadow": "輕率、不負責任、過度承諾、坐立不安、直言不諱傷人、逃避承諾。", "emotion": "外放、樂觀，不喜歡沉溺負面情緒。可能用幽默或「向前看」來處理痛苦。", "communication": "直接、熱情、愛分享大道理與故事。說話有感染力，但有時過於直接。", "decision": "追求自由與意義，喜歡大方向多過細節。現實例子：突然去旅行、轉行追求理想、或同時開很多新計劃。", "stress": "想逃脫、旅行、或追求新刺激來逃避限制。", "summary": "射手是火象＋變動，由木星統治。核心主題是「我探索、我相信、我追求意義」。\n\n現實中常見樣貌：\n- 工作上：適合需要自由與視野的崗位（教育、旅行、銷售、出版、哲學、跨文化工作）。\n- 生活上：可能是朋友圈的冒險家，喜歡長途旅行、學習新語言、或不斷追求成長。\n- 關係上：需要空間與共同成長，沉悶與束縛是大忌。\n\n射手能量的本質是「擴張與探索」。當健康時，他們是帶人看見更大世界的力量；當失衡時，就容易變得不負責任或逃避。理解射手，重點是他們對「自由」與「意義」有強烈需求。"}, "moon": {"name": "射手月亮 Moon in Sagittarius", "element": "火", "need": "需要自由、意義、探索與樂觀的視野。情緒上渴望成長、冒險、以及被允許追求更大的人生意義。", "security": "來自自由空間、新體驗、能夠看到希望與意義。被限制或困在負面情緒中會讓他們強烈想逃。", "expression": "外放、樂觀，不喜歡沉溺負面情緒。傾向用「向前看」、幽默或哲學思考來處理感受。", "shadow": "逃避責任、過度樂觀、用旅行或新計劃來逃避情緒、難以承諾、把痛苦理性化。", "withSun": "若太陽是土或水象，月亮會帶來擴張與樂觀，幫助太陽不那麼沉重。若太陽是火或風象，整體非常活躍、追求自由。\n\n簡要總結：射手月亮的人內在是「需要意義與自由的探索者」。他們透過擴張與希望來感覺安全。理解他們的關鍵是給空間與共同成長，而不是用限制來綁住他們。"}, "rising": {"name": "射手上升 Sagittarius Rising", "element": "火", "aura": "樂觀、開放，帶有冒險與哲學氣息。予人「充滿活力、喜歡大方向、不拘小節」之感。", "first": "熱情、直接，偶爾顯得輕率或過於直率。他人常感知其有趣、有想法，或略顯坐不住。", "social": "喜歡分享大道理、故事與新體驗。傾向開放式交流，可能同時追求多種連結與自由空間。", "gap": "若太陽屬於土象或水象，外在表現可能較內在更為開放、更追求自由，他人所感知的「樂觀」與真實的穩重或敏感之間，可能產生落差。\n若太陽屬於風象，外在的冒險探索與內在的思考流動，可能形成節奏上的差異。\n若太陽同屬火象，外在與內在的能量方向較為一致，整體呈現熱情而追求意義的特質。\n\n簡要總結：射手上升給人的第一印象為「追求自由的探索者」。其進入世界的方式，是以樂觀與開放為基礎。理解此上升的關鍵，在於給予空間與意義。"}}, {"slug": "capricorn", "zh": "摩羯座", "en": "Capricorn", "glyph": "♑", "dates": "12/22 – 01/19", "element": "土", "mode": "本位 Cardinal", "sun": {"name": "摩羯座 Capricorn", "element": "土", "mode": "本位 Cardinal", "keywords": "責任、野心、紀律、務實、成就、結構", "positive": "有責任感、耐心、務實、有野心、可靠、有組織力。摩羯人通常是會 silently 一步一步爬上去、對目標很有紀律的人。", "shadow": "冷酷、悲觀、工作狂、壓抑情感、控制、孤獨。", "emotion": "內斂、克制，不輕易表露脆弱。可能用成就與地位來證明自己。", "communication": "正式、實際、注重結果與地位。說話有分量，不喜歡浪費時間。", "decision": "長遠規劃、一步一步建設，重視成就與結構。現實例子：長期儲蓄、建立事業、或為未來做大量準備。", "stress": "更拼命工作、變得嚴厲與孤僻、或用控制來應對不安。", "summary": "摩羯是土象＋本位，由土星統治。核心主題是「我成就、我建構、我承擔責任」。\n\n現實中常見樣貌：\n- 工作上：適合需要耐心與結構的崗位（管理、金融、法律、工程、政府、長期項目）。\n- 生活上：可能是會為未來做計劃、重視地位與穩定、或默默承擔責任的人。\n- 關係上：忠誠但可能顯得冷淡，需要時間才打開心扉。\n\n摩羯能量的本質是「建設與成熟」。當健康時，他們是可靠的支柱；當失衡時，就容易變得僵硬與壓抑。理解摩羯，重點是他們對「成就」與「被尊重」有強烈需求。"}, "moon": {"name": "摩羯月亮 Moon in Capricorn", "element": "土", "need": "需要成就、結構、被尊重、以及能夠掌控自己的人生方向。情緒上渴望透過責任與成就來獲得安全感。", "security": "來自有明確目標、被認可能力、有結構的生活、以及能夠靠自己站穩。失敗或不被尊重會嚴重打擊安全感。", "expression": "內斂、克制，不輕易表露脆弱。傾向把情緒轉成努力工作或追求地位。可能用成就來證明自己值得被愛。", "shadow": "壓抑情緒、工作狂、冷酷、用控制來應對不安、難以接受脆弱、孤獨感。", "withSun": "若太陽是火或風象，月亮會帶來紀律與務實，幫助太陽更有結構。若太陽是土或水象，整體非常穩重但可能過於沉重。\n\n簡要總結：摩羯月亮的人內在是「需要透過成就與責任來感覺安全的建設者」。他們用結構與努力來安撫情緒。理解他們的關鍵是尊重他們的努力，並溫柔鼓勵他們表達脆弱。"}, "rising": {"name": "摩羯上升 Capricorn Rising", "element": "土", "aura": "沉穩、有紀律，帶有成熟與權威感。予人「可靠、有目標、不太輕易放鬆」之感。", "first": "認真、有責任感，偶爾顯得嚴肅或有距離感。他人常感知其專業、能承擔責任。", "social": "較為正式，重視實質與地位。可能先建立結構再互動，不偏好過於輕浮或缺乏目標的交流。", "gap": "若太陽屬於火象或風象，外在表現可能較內在更為沉穩、更有控制，他人所感知的「成熟」與真實的熱情或思緒流動之間，可能產生落差。\n若太陽屬於水象，外在的結構責任與內在的情感敏感，可能形成節奏上的差異。\n若太陽同屬土象，外在與內在的能量方向較為一致，整體呈現可靠而重視成就的特質。\n\n簡要總結：摩羯上升給人的第一印象為「有責任感的建設者」。其進入世界的方式，是以結構與成熟為基礎。理解此上升的關鍵，在於尊重其努力與目標。"}}, {"slug": "aquarius", "zh": "水瓶座", "en": "Aquarius", "glyph": "♒", "dates": "01/20 – 02/18", "element": "風", "mode": "固定 Fixed", "sun": {"name": "水瓶座 Aquarius", "element": "風", "mode": "固定 Fixed", "keywords": "獨立、創新、人道、叛逆、理智、未來", "positive": "有原創力、人道主義、獨立、前瞻、客觀、思想開放。水瓶人通常是會提出奇怪但有趣想法、關注社會議題的人。", "shadow": "疏離、固執於理念、叛逆、情感抽離、古怪、難以親密。", "emotion": "理智化情緒，重視群體多過個人親密。可能顯得冷靜甚至冷漠。", "communication": "前衛、客觀、有時顯得疏離或理想化。喜歡討論概念多過私人感受。", "decision": "以理念與未來為導向，不跟從傳統。現實例子：參與社會運動、發明新方法、或選擇非主流生活方式。", "stress": "更抽離、變得叛逆與固執於自己的想法。", "summary": "水瓶是風象＋固定，傳統由土星、現代由天王星統治。核心主題是「我革新、我屬於群體、我獨立思考」。\n\n現實中常見樣貌：\n- 工作上：適合需要創新與獨立的崗位（科技、研究、社會工作、設計、非營利、未來導向行業）。\n- 生活上：可能是朋友圈的「怪人」、關注大議題、或有獨特生活節奏的人。\n- 關係上：重視友誼與自由，親密時可能顯得疏離。\n\n水瓶能量的本質是「革新與客觀」。當健康時，他們是推動進步的力量；當失衡時，就容易變得孤立與教條。理解水瓶，重點是他們對「自由」與「理念」有強烈需求。"}, "moon": {"name": "水瓶月亮 Moon in Aquarius", "element": "風", "need": "需要獨立、思想自由、屬於更大群體或理念、以及被允許做自己。情緒上渴望客觀與抽離，不喜歡被個人情緒綁住。", "security": "來自思想自由、有理念支持、能夠保持距離、以及被接納為獨特的自己。過度親密或情緒化的要求會讓他們退縮。", "expression": "理智化情緒，傾向把感受抽離、用理念或群體角度來看事情。可能顯得冷靜甚至冷漠。", "shadow": "情感疏離、固執於理念、難以親密、用理性逃避真實感受、顯得古怪或不近人情。", "withSun": "若太陽是火或土象，月亮會帶來客觀與獨立，可能產生「外表有熱情／務實，內在很抽離」的落差。若太陽是風或水象，整體更重視理念與自由。\n\n簡要總結：水瓶月亮的人內在是「需要自由與理念的革新者」。他們透過抽離與思想獨立來感覺安全。理解他們的關鍵是尊重他們的距離與獨特性，不要強迫親密。"}, "rising": {"name": "水瓶上升 Aquarius Rising", "element": "風", "aura": "獨特、抽離，帶有理念與未來感。予人「有點與眾不同、很有自己想法、不太隨波逐流」之感。", "first": "獨立、有趣，偶爾顯得疏離或古怪。他人常感知其有想法，或略難理解。", "social": "重視思想交流與群體理念多於私人親密。可能保持一定距離，偏好與志同道合者連結。", "gap": "若太陽屬於火象或土象，外在表現可能較內在更為抽離、更理念導向，他人所感知的「獨立」與真實的熱情或務實之間，可能產生落差。\n若太陽屬於水象，外在的客觀抽離與內在的情感敏感，可能形成節奏上的差異。\n若太陽同屬風象，外在與內在的能量方向較為一致，整體呈現獨立而重視理念的特質。\n\n簡要總結：水瓶上升給人的第一印象為「獨立的革新者」。其進入世界的方式，是以獨特性與理念為基礎。理解此上升的關鍵，在於尊重其距離與不同。"}}, {"slug": "pisces", "zh": "雙魚座", "en": "Pisces", "glyph": "♓", "dates": "02/19 – 03/20", "element": "水", "mode": "變動 Mutable", "sun": {"name": "雙魚座 Pisces", "element": "水", "mode": "變動 Mutable", "keywords": "想像、同理、夢幻、敏感、逃避、融合", "positive": "有同理心、有想像力、慈悲、藝術氣質、直覺強、柔軟。雙魚人通常是會感受到他人情緒、有藝術或靈性氣質的人。", "shadow": "逃避現實、邊界模糊、情緒氾濫、受害者心態、優柔、成癮傾向。", "emotion": "深厚、流動、容易吸收他人情緒。可能用幻想或藝術來處理現實。", "communication": "委婉、詩意、有時模糊或間接。說話帶感情與想像。", "decision": "以感覺與直覺為主，不喜歡強硬界限。現實例子：投入藝術創作、助人工作、或容易被情緒帶動做決定。", "stress": "退縮到幻想、逃避現實、或情緒崩潰、成癮行為。", "summary": "雙魚是水象＋變動，傳統由木星、現代由海王星統治。核心主題是「我相信、我融合、我想像」。\n\n現實中常見樣貌：\n- 工作上：適合需要同理與創造力的崗位（藝術、音樂、輔導、護理、靈性、慈善）。\n- 生活上：可能是朋友圈的傾聽者、有豐富內心世界、或容易被氣氛影響的人。\n- 關係上：深情但可能邊界不清，需要學習保護自己。\n\n雙魚能量的本質是「融合與超越」。當健康時，他們是慈悲與靈感的來源；當失衡時，就容易迷失在幻想或他人情緒中。理解雙魚，重點是他們對「連結」與「意義」有強烈需求，同時需要學習現實邊界。"}, "moon": {"name": "雙魚月亮 Moon in Pisces", "element": "水", "need": "需要情感融合、想像空間、被無條件接納、以及靈性或藝術的滋養。情緒上渴望與他人或更大整體合一。", "security": "來自被溫柔接納、有想像與逃避的空間、情感上的融合、以及藝術或靈性活動。現實的強硬邊界會讓他們不安。", "expression": "深厚、流動、容易吸收他人情緒。可能用幻想、藝術、或退縮來處理現實。邊界較模糊。", "shadow": "逃避現實、邊界不清、情緒氾濫、受害者心態、成癮傾向、難以分辨自己與他人的感受。", "withSun": "若太陽是火或土象，月亮會帶來敏感與想像，可能產生「外表強勢／務實，內在很夢幻」的落差。若太陽是水或風象，情感與想像能量非常強。\n\n簡要總結：雙魚月亮的人內在是「需要融合與想像的夢想家」。他們透過連結與超越來感覺安全。理解他們的關鍵是給溫柔與想像空間，同時溫柔幫助他們建立必要的現實邊界。"}, "rising": {"name": "雙魚上升 Pisces Rising", "element": "水", "aura": "柔和、夢幻，帶有敏感與藝術氣息。予人「有點不真實、善於感受氣氛、容易融入」之感。", "first": "溫柔、有同理心，偶爾顯得模糊或容易受影響。他人常感知其藝術氣質，或略難捉摸。", "social": "重視情感流動與氣氛。可能先感受再回應，容易吸收他人情緒，邊界較為柔和。", "gap": "若太陽屬於火象或土象，外在表現可能較內在更為柔和、更敏感，他人所感知的「夢幻」與真實的直接或務實之間，可能產生落差。\n若太陽屬於風象，外在的敏感融合與內在的思考流動，可能形成節奏上的差異。\n若太陽同屬水象，外在與內在的情感能量較為一致，整體呈現敏感而具想像力的特質。\n\n簡要總結：雙魚上升給人的第一印象為「敏感的融合者」。其進入世界的方式，是以同理與想像為基礎。理解此上升的關鍵，在於給予溫柔空間，並協助建立必要邊界。"}}]};
+</script>
+<script>
+(function(){
+"use strict";
+const S = DATA.signs, G = DATA.guide;
+const EL = {"火":"fire","土":"earth","風":"air","水":"water"};
+const EL_EMO = {"火":"🔥","土":"🌱","風":"🌬️","水":"🌊"};
+const bySlug = Object.assign(Object.create(null),Object.fromEntries(S.map(s=>[s.slug,s])));
+const idx = slug => S.findIndex(s=>s.slug===slug);
+const $ = (q,r=document)=>r.querySelector(q);
+const $$ = (q,r=document)=>[...r.querySelectorAll(q)];
+const esc = t => String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const app = $("#app");
+$("#foot-disc").textContent = "⚠️ " + G.disclaimer;
+
+/* ---------- helpers ---------- */
+let skipHash=false;
+function softHash(h,rerender){ // update the address bar without relying on history API support
+  try{ history.replaceState(null,"",h); if(rerender) route(); }
+  catch(e){ if(location.hash===h){ if(rerender) route(); return; } if(!rerender) skipHash=true; location.hash=h; }
+}
+function para(t){ // plain text -> paragraphs, "- " lines -> lists
+  const lines = String(t).split("\n"); let out="", list=false;
+  for(const l of lines){
+    if(/^\s*-\s+/.test(l)){ if(!list){out+="<ul>";list=true} out+="<li>"+esc(l.replace(/^\s*-\s+/,""))+"</li>"; }
+    else { if(list){out+="</ul>";list=false} if(l.trim()) out+="<p>"+esc(l)+"</p>"; }
+  }
+  if(list) out+="</ul>"; return out;
+}
+function splitSummary(t){
+  const i = String(t||"").indexOf("簡要總結：");
+  if(i<0) return [t||"", ""];
+  return [t.slice(0,i).trim(), t.slice(i+5).trim()];
+}
+const wip = (what)=>`<div class="wip"><span class="em" aria-hidden="true">🛠️</span><b>內容整理中</b><br>${esc(what)}的資料仍在 Notion 整理，之後會補上。</div>`;
+function sec(icon,title,text,cls=""){
+  if(!text) return "";
+  return `<article class="sec ${cls}"><h4><span class="ic" aria-hidden="true">${icon}</span>${esc(title)}</h4>${/\n/.test(text)?para(text):"<p>"+esc(text)+"</p>"}</article>`;
+}
+let toastT;
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),2200); }
+function copy(text,msg){
+  const done=()=>toast(msg||"已複製 ✓");
+  if(navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(text).then(done,()=>fb()); } else fb();
+  function fb(){ const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy")}catch(e){} ta.remove(); done(); }
+}
+
+/* ---------- starfield ---------- */
+(function stars(){
+  const c = $("#stars"), x = c.getContext("2d"); let W,H,dpr,st=[],shoot=null,mx=0,my=0;
+  function size(){ dpr=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight; c.width=W*dpr; c.height=H*dpr; x.setTransform(dpr,0,0,dpr,0,0);
+    const n=Math.round(W*H/5500); st=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.2,z:Math.random()*.8+.2,p:Math.random()*6.28,h:[210,260,330,45][Math.floor(Math.random()*4)]})); draw(0); }
+  function draw(t){
+    x.clearRect(0,0,W,H);
+    for(const s of st){
+      const tw = reduce?.8:.55+.45*Math.sin(t/900*s.z+s.p);
+      const ox = mx*s.z*14, oy = my*s.z*14;
+      x.beginPath(); x.fillStyle=`hsla(${s.h},90%,88%,${tw})`; x.arc(s.x+ox,s.y+oy,s.r,0,6.283); x.fill();
+    }
+    if(shoot){ x.strokeStyle="rgba(255,255,255,.85)"; x.lineWidth=1.6; x.beginPath(); x.moveTo(shoot.x,shoot.y); x.lineTo(shoot.x-shoot.vx*7,shoot.y-shoot.vy*7); x.stroke(); shoot.x+=shoot.vx; shoot.y+=shoot.vy; shoot.l--; if(shoot.l<=0)shoot=null; }
+    else if(!reduce && Math.random()<.004) shoot={x:Math.random()*W*.8+W*.2,y:Math.random()*H*.4,vx:-9-Math.random()*5,vy:4+Math.random()*3,l:50};
+    if(!reduce) requestAnimationFrame(draw);
+  }
+  addEventListener("resize",size);
+  addEventListener("pointermove",e=>{mx=(e.clientX/W-.5);my=(e.clientY/H-.5)},{passive:true});
+  size(); if(!reduce) requestAnimationFrame(draw);
+})();
+
+/* ---------- wheel (SVG) ---------- */
+function wheelSVG(){
+  const cx=260, cy=260, R=250, r=140, n=12; let seg="", ticks="";
+  const pt=(rad,a)=>[cx+rad*Math.cos(a), cy+rad*Math.sin(a)];
+  S.forEach((s,i)=>{
+    const a0=(i*30-90-15)*Math.PI/180, a1=((i+1)*30-90-15)*Math.PI/180, am=(a0+a1)/2, gap=.012;
+    const [x0,y0]=pt(R,a0+gap),[x1,y1]=pt(R,a1-gap),[x2,y2]=pt(r,a1-gap),[x3,y3]=pt(r,a0+gap);
+    const [gx,gy]=pt((R+r)/2+6,am), [nx,ny]=pt((R+r)/2-30,am);
+    const e=EL[s.element];
+    seg+=`<g class="seg" data-el="${e}" data-slug="${s.slug}" tabindex="0" role="link" aria-label="${esc(s.zh)} ${esc(s.dates)}">
+      <path d="M${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1} L${x2} ${y2} A${r} ${r} 0 0 0 ${x3} ${y3}Z" fill="url(#g-${e})" stroke="rgba(255,255,255,.35)" stroke-width="1.2" opacity=".92"/>
+      <text x="${gx}" y="${gy}" text-anchor="middle" dominant-baseline="central" font-size="34" fill="#fff" style="font-family:'Segoe UI Symbol','Noto Sans Symbols','Noto Sans Symbols 2','Apple Symbols',sans-serif">${s.glyph}</text>
+      <text x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:rgba(0,0,0,.4);stroke-width:3px">${esc(s.zh.replace("座",""))}</text>
+    </g>`;
+  });
+  for(let i=0;i<72;i++){ const a=(i*5)*Math.PI/180, [ax,ay]=pt(R+8,a), [bx,by]=pt(R+(i%6===0?24:15),a); ticks+=`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="rgba(255,255,255,${i%6===0?.7:.3})" stroke-width="${i%6===0?2:1}"/>`; }
+  const grad=(e,a,b)=>`<linearGradient id="g-${e}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--${e}-a)"/><stop offset="1" stop-color="var(--${e}-b)" stop-opacity=".75"/></linearGradient>`;
+  return `<svg class="wheel" viewBox="-30 -30 580 580" role="group" aria-label="十二星座星盤，點擊任何一格進入該星座">
+    <defs>${grad("fire")}${grad("earth")}${grad("air")}${grad("water")}</defs>
+    <g class="ring">${ticks}<circle cx="${cx}" cy="${cy}" r="${R+30}" fill="none" stroke="rgba(255,255,255,.2)" stroke-dasharray="2 8"/></g>
+    ${seg}
+    <circle cx="${cx}" cy="${cy}" r="${r-8}" fill="none" stroke="rgba(255,255,255,.25)" stroke-dasharray="4 6"/>
+  </svg>`;
+}
+
+/* ---------- views ---------- */
+function cardHTML(s){
+  const e=EL[s.element], kws=(s.sun&&s.sun.keywords||"").split("、").slice(0,4).join("、");
+  return `<a class="card" data-el="${e}" data-element="${s.element}" href="#/${s.slug}" aria-label="${esc(s.zh)}，${esc(s.dates)}，${s.element}象">
+    <div class="g" aria-hidden="true">${s.glyph}</div>
+    <h3>${esc(s.zh)}</h3><div class="en">${esc(s.en)}</div><div class="dt">${esc(s.dates)}</div>
+    <div class="tags"><span class="tag">${EL_EMO[s.element]} ${s.element}象</span><span class="tag">${esc(s.mode.split(" ")[0])}</span></div>
+    <div class="kw">${esc(kws)}</div></a>`;
+}
+
+function viewHome(){
+  const filled = k => S.filter(s=>s[k]).length;
+  app.innerHTML = `<div class="view">
+  <section class="hero">
+    <div>
+      <span class="eyebrow">✦ SUN · MOON · RISING</span>
+      <h1 class="title">你的星空，<br>由你親手開啟</h1>
+      <p class="lead">十二星座 × 太陽、月亮、上升。不只是一大堆文字——點一點星盤、翻一翻卡片，再用「Big Three 組合器」組合出屬於你的三重性格卡。</p>
+      <div class="cta">
+        <a class="btn primary" href="#signs" data-scroll="signs">🪐 進入十二星座</a>
+        <a class="btn" href="#/mix">🎴 玩 Big Three 組合器</a>
+        <a class="btn" href="#/checklist">📝 自我觀察清單</a>
+        <button class="btn" type="button" data-rand>🎲 隨機抽一個</button>
+      </div>
+      <div class="stats"><div><b>12</b>星座</div><div><b>${filled("sun")+filled("moon")+filled("rising")}</b>份資料卡</div><div><b>3</b>個層次</div></div>
+    </div>
+    <div class="wheel-wrap">${wheelSVG()}
+      <div class="wheel-center" aria-hidden="true"><div class="wc-in" id="wc"><div class="wc-glyph">✦</div><div class="wc-name">點一格</div><div class="wc-sub">試試看</div></div></div>
+    </div>
+  </section>
+
+  <section class="block" id="signs">
+    <div class="sec-h"><div><h2 class="sec-t">🪐 十二星座圖鑑</h2><p class="sec-s">點擊卡片進入該星座，查看太陽・月亮・上升。用元素篩選更快找到你想看的星座。</p></div>
+      <div class="chips" role="group" aria-label="按元素篩選">
+        <button class="chip" type="button" aria-pressed="true" data-f="all">✨ 全部</button>
+        ${["火","土","風","水"].map(k=>`<button class="chip" type="button" aria-pressed="false" data-f="${k}" data-el="${EL[k]}">${EL_EMO[k]} ${k}象</button>`).join("")}
+      </div></div>
+    <div class="grid" id="grid">${S.map(cardHTML).join("")}</div>
+  </section>
+
+  <section class="block">
+    <div class="panel" style="text-align:center;padding:34px 20px;background:linear-gradient(120deg,rgba(255,122,69,.18),rgba(138,107,255,.22),rgba(82,199,255,.16))">
+      <h2 class="sec-t">🎴 你的 Big Three 是什麼組合？</h2>
+      <p class="sec-s" style="margin-bottom:18px">選擇太陽、月亮、上升，三張卡並排查看，還可以複製分享文字。</p>
+      <a class="btn primary" href="#/mix">開始組合 →</a>
+    </div>
+  </section>
+  <section class="block">
+    <div class="panel" style="text-align:center;padding:30px 20px;background:linear-gradient(120deg,rgba(79,196,127,.16),rgba(82,199,255,.18),rgba(210,125,255,.16))">
+      <h2 class="sec-t">📝 自我觀察清單</h2>
+      <p class="sec-s" style="margin-bottom:18px">把太陽、月亮、上升的描述變成可勾選的觀察問題，留意自己近來的真實狀態。</p>
+      <a class="btn" href="#/checklist">開始觀察 →</a>
+    </div>
+  </section>
+  </div>`;
+  // wheel interactions
+  const wc=$("#wc");
+  $$(".seg").forEach(g=>{
+    const s=bySlug[g.dataset.slug];
+    const show=()=>{ wc.style.setProperty("--a",`var(--${EL[s.element]}-a)`); wc.querySelector(".wc-glyph").textContent=s.glyph; wc.querySelector(".wc-glyph").style.color=`var(--${EL[s.element]}-b)`; wc.querySelector(".wc-name").textContent=s.zh; wc.querySelector(".wc-sub").textContent=s.dates; wc.style.borderColor=`var(--${EL[s.element]}-a)`; };
+    g.addEventListener("mouseenter",show); g.addEventListener("focus",show);
+    g.addEventListener("click",()=>go("#/"+s.slug));
+    g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();go("#/"+s.slug)} });
+  });
+  // filters
+  $$(".chip[data-f]").forEach(b=>b.addEventListener("click",()=>{
+    $$(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+    const f=b.dataset.f; $$("#grid .card").forEach(c=>c.classList.toggle("hide", f!=="all" && c.dataset.element!==f));
+    const g=$("#grid"); g.style.animation="none"; void g.offsetWidth; g.style.animation="viewIn .45s both";
+  }));
+  tilt($$("#grid .card"));
+  $$("[data-scroll]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault(); $("#"+a.dataset.scroll).scrollIntoView({behavior:reduce?"auto":"smooth"})}));
+  $$("[data-rand]").forEach(b=>b.addEventListener("click",randomSign));
+}
+
+function tilt(cards){
+  if(reduce) return;
+  cards.forEach(c=>{
+    c.addEventListener("pointermove",e=>{ if(e.pointerType==="touch") return; const r=c.getBoundingClientRect(), px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+      c.style.setProperty("--ry",((px-.5)*14).toFixed(1)+"deg"); c.style.setProperty("--rx",((.5-py)*14).toFixed(1)+"deg"); c.style.setProperty("--mx",(px*100)+"%"); c.style.setProperty("--my",(py*100)+"%"); });
+    c.addEventListener("pointerleave",()=>{c.style.setProperty("--rx","0deg");c.style.setProperty("--ry","0deg")});
+  });
+}
+
+function sunPanel(s){
+  const d=s.sun; if(!d) return wip("太陽星座");
+  const [body,tail]=splitSummary(d.summary);
+  return `<div class="kwrow" aria-label="關鍵詞">${d.keywords.split("、").map((k,i)=>`<span class="kw-chip" style="animation-delay:${i*70}ms">${esc(k)}</span>`).join("")}</div>
+  <div class="tags" style="margin-top:12px"><span class="tag">${EL_EMO[d.element]} ${d.element}象</span><span class="tag">模式：${esc(d.mode)}</span></div>
+  <div class="sections">
+   ${sec("✨","正面特質",d.positive,"good wide")}
+   ${sec("🌑","陰影／挑戰",d.shadow,"dark wide")}
+   ${sec("💗","情緒表達",d.emotion)}
+   ${sec("💬","溝通風格",d.communication)}
+   ${sec("🧭","決策與行動",d.decision)}
+   ${sec("⚡","壓力反應",d.stress)}
+  </div>
+  <div class="sum"><h4>📖 簡短總結</h4>${para(body)}</div>`;
+}
+function moonPanel(s){
+  const d=s.moon; if(!d) return wip("月亮星座");
+  const [body,tail]=splitSummary(d.withSun);
+  return `<div class="tags"><span class="tag">${EL_EMO[d.element]} ${d.element}象月亮</span></div>
+  <div class="sections">
+   ${sec("🫶","核心需求",d.need,"wide")}
+   ${sec("🏡","安全感來源",d.security)}
+   ${sec("💗","情緒表達方式",d.expression)}
+   ${sec("🌑","陰影面",d.shadow,"dark wide")}
+   ${sec("☀️","與太陽常見互動",body,"wide")}
+  </div>
+  ${tail?`<div class="sum"><h4>📖 簡要總結</h4><p>${esc(tail)}</p></div>`:""}`;
+}
+function risingPanel(s){
+  const d=s.rising; if(!d) return wip("上升星座");
+  const [body,tail]=splitSummary(d.gap);
+  return `<div class="tags"><span class="tag">${EL_EMO[d.element]} ${d.element}象上升</span></div>
+  <div class="sections">
+   ${sec("🎭","外在氣質",d.aura,"wide")}
+   ${sec("👋","第一印象",d.first)}
+   ${sec("🤝","社交風格",d.social)}
+   ${sec("↔️","與太陽的落差",body,"wide")}
+  </div>
+  ${tail?`<div class="sum"><h4>📖 簡要總結</h4><p>${esc(tail)}</p></div>`:""}`;
+}
+const TABS=[["sun","☀️","太陽","核心人格",sunPanel],["moon","🌙","月亮","內在情緒",moonPanel],["rising","⬆️","上升","外在印象",risingPanel]];
+
+function viewSign(slug,tab){
+  const s=bySlug[slug], i=idx(slug), prev=S[(i+11)%12], next=S[(i+1)%12];
+  tab = TABS.some(t=>t[0]===tab)?tab:"sun";
+  app.innerHTML = `<div class="view" data-el="${EL[s.element]}">
+   <div class="crumbs"><a class="btn" href="#/">← 返回星盤</a><a class="btn" href="#/mix/${s.slug}">🎴 放入組合器</a></div>
+   <div class="d-hero">
+     <div class="d-glyph" aria-hidden="true">${s.glyph}</div>
+     <div><div class="en">${esc(s.en.toUpperCase())} · ${esc(s.dates)}</div><h2>${esc(s.zh)}</h2>
+       <div class="tags"><span class="tag">${EL_EMO[s.element]} ${s.element}象</span><span class="tag">${esc(s.mode)}</span></div></div>
+   </div>
+   <div class="tabs" role="tablist" aria-label="太陽、月亮、上升">
+     ${TABS.map(t=>`<button class="tab" role="tab" id="tab-${t[0]}" aria-selected="${t[0]===tab}" aria-controls="tp" data-t="${t[0]}" tabindex="${t[0]===tab?0:-1}">${t[1]} ${t[2]} <small>${t[3]}</small></button>`).join("")}
+   </div>
+   <div id="tp" class="tp" role="tabpanel" aria-labelledby="tab-${tab}">${TABS.find(t=>t[0]===tab)[4](s)}</div>
+   <div class="pn">
+     <a class="btn" href="#/${prev.slug}" rel="prev">←&nbsp;<span><small>上一個</small>${prev.glyph} ${esc(prev.zh)}</span></a>
+     <a class="btn" href="#/${next.slug}" rel="next"><span style="text-align:right"><small>下一個</small>${next.glyph} ${esc(next.zh)}</span>&nbsp;→</a>
+   </div>
+  </div>`;
+  const tabs=$$(".tab");
+  tabs.forEach((b,k)=>{
+    b.addEventListener("click",()=>softHash("#/"+slug+(b.dataset.t==="sun"?"":"/"+b.dataset.t),true));
+    b.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ const n=tabs[(k+(e.key==="ArrowRight"?1:2))%3]; n.focus(); n.click(); n.focus(); } });
+  });
+  document.title = s.zh+" · 星空小宇宙";
+}
+
+function viewElements(){
+  const chipRow = arr => arr.map(sl=>`<button type="button" data-go="${sl}">${bySlug[sl].glyph} ${esc(bySlug[sl].zh)}</button>`).join("");
+  app.innerHTML = `<div class="view">
+  <div class="crumbs"><a class="btn" href="#/">← 返回星盤</a></div>
+  <section class="block" style="padding-top:20px">
+    <h2 class="sec-t">🔥 元素與模式</h2><p class="sec-s">${esc(G.intro)}</p>
+    <h3 style="font-family:var(--serif);margin:26px 0 12px">四大元素</h3>
+    <div class="el-grid">${G.elements.map(e=>`<div class="panel" data-el="${EL[e.key]}"><h3>${EL_EMO[e.key]} ${esc(e.name)}</h3><div class="mini">${chipRow(e.signs)}</div><p>${esc(e.desc)}</p><p class="pc"><b>優點：</b>${esc(e.pro)}</p><p class="pc"><b>挑戰：</b>${esc(e.con)}</p></div>`).join("")}</div>
+    <div class="note">🌗 ${esc(G.yinyang)}</div>
+    <h3 style="font-family:var(--serif);margin:30px 0 12px">三種模式</h3>
+    <div class="el-grid">${G.modes.map((m,i)=>`<div class="panel" data-el="${["fire","air","water"][i]}"><h3>${["🚀","⚓","🌀"][i]} ${esc(m.name)}</h3><div class="mini">${chipRow(m.signs)}</div><p>${esc(m.desc)}</p><p class="pc"><b>現實表現：</b>${esc(m.real)}</p><p class="pc"><b>優點：</b>${esc(m.pro)}</p><p class="pc"><b>挑戰：</b>${esc(m.con)}</p></div>`).join("")}</div>
+    <div class="note">🔁 ${esc(G.modeNote)}</div>
+  </section>
+  <section class="block">
+    <h2 class="sec-t">🎴 Big Three 組合分析框架</h2>
+    <div class="panel scroll-x" style="margin-top:14px"><table class="bt"><thead><tr><th>位置</th><th>代表意義</th><th>核心問題</th></tr></thead><tbody>
+    ${G.bigThree.map(b=>`<tr><td><b>${b.icon} ${b.pos}</b></td><td>${esc(b.meaning)}</td><td>${esc(b.q)}</td></tr>`).join("")}</tbody></table></div>
+    <div class="el-grid" style="margin-top:16px">
+      <div class="panel"><h3>🧭 解讀優先順序建議</h3><ol class="pri">${G.priority.map(p=>`<li><b>${esc(p[0])}</b><br>${esc(p[1])}</li>`).join("")}</ol></div>
+      <div class="panel"><h3>🎨 常見組合舉例</h3><ul class="pri" style="padding-left:1.1em">${G.combos.map(p=>`<li><b>${esc(p[0])}</b><br>${esc(p[1])}</li>`).join("")}</ul></div>
+    </div>
+    <div class="note">💡 ${esc(G.comboNote)}</div>
+    <div class="note" style="border-color:#ffd27a">⚠️ ${esc(G.disclaimer)}</div>
+    <div class="row-act"><a class="btn primary" href="#/mix">🎴 去試組合器</a></div>
+  </section></div>`;
+  $$("[data-go]").forEach(b=>b.addEventListener("click",()=>go("#/"+b.dataset.go)));
+  document.title="元素與模式 · 星空小宇宙";
+}
+
+/* ---------- mixer ---------- */
+function mixState(a){ const ok=x=>x&&bySlug[x]?x:null; return {sun:ok(a[0]),moon:ok(a[1]),rising:ok(a[2])}; }
+function viewMix(args){
+  const st = args.length===1 ? {sun:bySlug[args[0]]?args[0]:null,moon:null,rising:null} : mixState(args);
+  const label={sun:["☀️","太陽","你的核心人格"],moon:["🌙","月亮","你的內在情緒"],rising:["⬆️","上升","你的外在印象"]};
+  app.innerHTML=`<div class="view">
+   <div class="crumbs"><a class="btn" href="#/">← 返回星盤</a></div>
+   <section class="block" style="padding-top:14px">
+    <div class="sec-h"><div><h2 class="sec-t">🎴 Big Three 組合器</h2><p class="sec-s">三個位置各選一個星座，立即組合出你的三重性格卡。不知道上升？也可以隨意選著玩玩。</p></div>
+     <div class="chips"><button class="chip" type="button" id="mx-rand">🎲 隨機組合</button><button class="chip" type="button" id="mx-clear">清除</button></div></div>
+    <div class="mix-ctl">
+     ${Object.keys(label).map(k=>`<div class="sel" data-pos="${k}"><label for="sel-${k}">${label[k][0]} ${label[k][1]}　<small style="font-weight:400;color:var(--mute)">${label[k][2]}</small></label>
+       <select id="sel-${k}"><option value="">— 請選擇 —</option>${S.map(s=>`<option value="${s.slug}"${st[k]===s.slug?" selected":""}>${s.glyph} ${s.zh}（${s.dates}）</option>`).join("")}</select>
+       <div class="pick" role="group" aria-label="快速選擇${label[k][1]}">${S.map(s=>`<button type="button" data-v="${s.slug}" data-el="${EL[s.element]}" aria-pressed="${st[k]===s.slug}" title="${esc(s.zh)}" aria-label="${esc(s.zh)}">${s.glyph}</button>`).join("")}</div></div>`).join("")}
+    </div>
+    <div class="mix-res" id="mix-res" aria-live="polite"></div>
+   </section></div>`;
+  const cur={...st};
+  const sync=()=>{
+    $$(".sel").forEach(el=>{ const k=el.dataset.pos; $("select",el).value=cur[k]||""; $$(".pick button",el).forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===cur[k]))); });
+    const h = "#/mix"+(cur.sun||cur.moon||cur.rising?"/"+[cur.sun,cur.moon,cur.rising].map(x=>x||"_").join("/"):"");
+    softHash(h,false); renderMix(cur);
+  };
+  $$(".sel").forEach(el=>{ const k=el.dataset.pos;
+    $("select",el).addEventListener("change",e=>{cur[k]=e.target.value||null;sync()});
+    $$(".pick button",el).forEach(b=>b.addEventListener("click",()=>{cur[k]=b.dataset.v;sync()}));
+  });
+  $("#mx-rand").addEventListener("click",()=>{const r=()=>S[Math.floor(Math.random()*12)].slug;cur.sun=r();cur.moon=r();cur.rising=r();sync()});
+  $("#mx-clear").addEventListener("click",()=>{cur.sun=cur.moon=cur.rising=null;sync()});
+  renderMix(cur); document.title="Big Three 組合器 · 星空小宇宙";
+}
+function elStr(s){return EL_EMO[s.element]+s.element+"象"}
+function dl(pairs){ return "<dl>"+pairs.filter(p=>p[1]).map(p=>`<dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd>`).join("")+"</dl>"; }
+function renderMix(cur){
+  const box=$("#mix-res");
+  if(!cur.sun&&!cur.moon&&!cur.rising){ box.innerHTML=`<div class="wip"><span class="em" aria-hidden="true">🔮</span>選好至少一個位置，卡片就會在這裡出現。</div>`; return; }
+  const cols=[["sun","☀️ 太陽 · 核心身份與意志"],["moon","🌙 月亮 · 內在情緒與需求"],["rising","⬆️ 上升 · 外在呈現與第一反應"]].map(([k,t])=>{
+    const s=cur[k]?bySlug[cur[k]]:null;
+    if(!s) return `<div class="tcol" data-el=""><div class="pos">${t}</div><div class="wip" style="margin:12px 0 0;padding:26px 10px">尚未選擇${k==="sun"?"太陽":k==="moon"?"月亮":"上升"}</div></div>`;
+    const d=s[k]; let body;
+    if(!d) body=`<div class="wip" style="margin-top:12px;padding:24px 10px"><b>內容整理中</b></div>`;
+    else if(k==="sun") body=dl([["關鍵詞",d.keywords],["正面特質",d.positive],["陰影／挑戰",d.shadow],["情緒表達",d.emotion],["壓力反應",d.stress]]);
+    else if(k==="moon") body=dl([["核心需求",d.need.split("\n")[0]],["安全感來源",d.security],["情緒表達方式",d.expression],["陰影面",d.shadow]]);
+    else body=dl([["外在氣質",d.aura],["第一印象",d.first],["社交風格",d.social]]);
+    return `<div class="tcol" data-el="${EL[s.element]}"><div class="pos">${t}</div><h3><span class="g" aria-hidden="true">${s.glyph}</span>${esc(s.zh)}</h3><div class="tags"><span class="tag">${elStr(s)}</span>${k==="sun"?`<span class="tag">${esc(s.mode.split(" ")[0])}</span>`:""}</div>${body}<div class="more"><a class="btn" style="padding:8px 16px;font-size:.9rem" href="#/${s.slug}${k==="sun"?"":"/"+k}">看完整${k==="sun"?"太陽":k==="moon"?"月亮":"上升"}內容 →</a></div></div>`;
+  }).join("");
+  // insight from Notion framework
+  const picked=["sun","moon","rising"].filter(k=>cur[k]).map(k=>bySlug[cur[k]]);
+  let insight="";
+  if(cur.sun&&cur.moon&&cur.rising){
+    const els=picked.map(s=>s.element), uniq=[...new Set(els)];
+    const modes=[...new Set(picked.map(s=>s.mode.split(" ")[0]))];
+    const first = uniq.length===1 ? `三者同屬 ${uniq[0]}象，能量流動較順暢。` : uniq.length===2 ? `出現 ${uniq.join("、")} 兩種元素，內在有一點張力與豐富度。` : `三者元素各不相同（${uniq.join("、")}），常產生內在張力與豐富度。`;
+    let extra=""; if(uniq.length===1&&uniq[0]==="火") extra=`<p>🔥 ${esc(G.combos[0][0])}：${esc(G.combos[0][1])}</p>`;
+    const cb=G.combos.slice(1).find(c=>{const m=c[0].match(/(.)太陽 \+ (.)月亮 \+ (.)上升/); return m&&m[1]===els[0]&&m[2]===els[1]&&m[3]===els[2]});
+    if(cb) extra+=`<p>🎨 ${esc(cb[0])}：${esc(cb[1])}</p>`;
+    const sg = cur.sun!==cur.rising ? "" : "太陽與上升同星座，內外一致。";
+    insight=`<div class="panel insight"><h3>🧭 小提示（依你的 Notion 解讀順序）</h3>
+      <div class="verdict"><span class="v-pill">元素：${esc(els.join(" / "))}</span><span class="v-pill">模式：${esc(picked.map(s=>s.mode.split(" ")[0]).join(" / "))}</span></div>
+      <p>① ${esc(first)}</p><p>② 太陽與上升的落差，可查看上方「上升」卡內的「與太陽的落差」。${sg?esc(sg):""}</p><p>③ 月亮會影響情緒是否支援核心意志，可查看「月亮」卡內的「與太陽常見互動」。</p><p>④ 模式分佈：${esc(modes.join("、"))}${modes.length===1?"——傾向單一節奏。":"。"}</p>${extra}
+      <div class="note">${esc(G.comboNote)}</div></div>`;
+  }
+  // share text
+  const nm=(k)=>cur[k]?bySlug[cur[k]].zh:"（未選）";
+  const link=location.href;
+  const lines=["✨ 我的 Big Three ✨",`☀️ 太陽：${nm("sun")}${cur.sun?"（"+bySlug[cur.sun].sun.keywords+"）":""}`,`🌙 月亮：${nm("moon")}`,`⬆️ 上升：${nm("rising")}`];
+  if(cur.sun&&bySlug[cur.sun].sun) lines.push("太陽關鍵詞："+bySlug[cur.sun].sun.keywords);
+  if(cur.moon&&bySlug[cur.moon].moon) lines.push("月亮核心需求："+bySlug[cur.moon].moon.need.split("\n")[0].split("。")[0]+"。");
+  if(cur.rising&&bySlug[cur.rising].rising) lines.push("上升第一印象："+bySlug[cur.rising].rising.first.split("。")[0]+"。");
+  lines.push("※ 傳統占星描述性整理，用作自我反思，並非命運決定論。");
+  const txt=lines.filter((l,i)=>!(i===1&&false)).join("\n");
+  box.innerHTML=`<div class="trio">${cols}</div>${insight}
+   <div class="panel share-box"><h3>📤 分享我的組合</h3><pre class="share" id="share-txt">${esc(txt)}</pre>
+    <div class="row-act" style="margin-top:6px"><button class="btn primary" type="button" id="cp-txt">複製文字</button><button class="btn" type="button" id="cp-link">複製連結</button></div></div>`;
+  $("#cp-txt").addEventListener("click",()=>copy(txt+"\n"+location.href,"已複製分享文字 ✓"));
+  $("#cp-link").addEventListener("click",()=>copy(location.href,"已複製連結 ✓"));
+}
+
+
+/* ---------- self-observation checklist ---------- */
+const CL_KEY="zodiacChecklistV1";
+const CL_LAYERS=[
+  {k:"sun",icon:"☀️",name:"太陽",q:"「我是誰？我往哪裡走？」",meaning:"核心身份與意志"},
+  {k:"moon",icon:"🌙",name:"月亮",q:"「我感覺什麼？我需要什麼才安全？」",meaning:"內在情緒與需求"},
+  {k:"rising",icon:"⬆️",name:"上升",q:"「別人怎麼看我？我怎麼進入世界？」",meaning:"外在呈現與第一反應"}
+];
+let clMem=null;
+const isObj=o=>o&&typeof o==="object"&&!Array.isArray(o);
+function clFresh(){ return {v:2,c:{},p:{},snap:null,prev:null}; }
+const LAYER_KEYS=["sun","moon","rising"];
+function normSnap(o){ // validates a stored result snapshot; returns null if anything is off
+  if(!isObj(o)||!isObj(o.l)) return null;
+  const num=x=>typeof x==="number"&&isFinite(x)&&x>=0&&x<=100;
+  if(!(typeof o.t==="number"&&isFinite(o.t)&&o.t>0)||!num(o.o)) return null;
+  const l={}; for(const k of LAYER_KEYS){ if(!num(o.l[k])) return null; l[k]=Math.round(o.l[k]); }
+  return {t:Math.floor(o.t),o:Math.round(o.o),l};
+}
+function clNormalize(o){ // accepts current or older formats; unknown/old keys (n,t,r) are dropped
+  const s=clFresh(); if(!isObj(o)) return s;
+  if(isObj(o.c)) for(const k of Object.keys(o.c)) if(o.c[k]&&typeof k==="string"&&k.length<200) s.c[k]=1;
+  if(isObj(o.p)) for(const l of ["sun","moon","rising"]) if(typeof o.p[l]==="string"&&bySlug[o.p[l]]) s.p[l]=o.p[l];
+  s.snap=normSnap(o.snap); s.prev=normSnap(o.prev);
+  return s;
+}
+function clLoad(){
+  let raw; try{ raw=localStorage.getItem(CL_KEY); }catch(e){ return clMem||(clMem=clFresh()); }
+  let o=null; if(raw){ try{ o=JSON.parse(raw); }catch(e){ o=null; } }
+  clMem=clNormalize(o); return clMem;
+}
+function clSave(s){ clMem=s; try{ localStorage.setItem(CL_KEY,JSON.stringify({v:2,c:s.c,p:s.p,snap:s.snap||null,prev:s.prev||null})); }catch(e){} }
+const sents = t => String(t||"").split(/[\n。]/).map(x=>x.trim()).filter(Boolean);
+const quote = x => "「"+x.replace(/[。；;]+$/,"")+"」";
+function clItems(layer,slug,sunSlug){
+  const out=[];
+  if(!slug){ // generic: from Chapter 1 element / mode descriptions
+    const A={sun:["我近來是否在行事中展現","我在哪些事情上發揮了","我是否察覺自己出現"],
+             moon:["在情緒上，我是否常出現","我的內在情緒中，是否帶有","我的情緒反應中，是否出現過"],
+             rising:["在新環境或社交場合，我是否表現出","別人是否曾看見我","別人是否曾感覺到我"]}[layer];
+    G.elements.forEach(e=>{
+      const first=e.desc.split("。")[0];
+      out.push({group:`${EL_EMO[e.key]} ${e.name}`,el:EL[e.key],entries:[
+        {id:`${layer}:gen:${e.key}:0`,text:`${A[0]}${quote(first)}？`},
+        {id:`${layer}:gen:${e.key}:1`,text:`${A[1]}${quote(e.pro)}的一面？`},
+        {id:`${layer}:gen:${e.key}:2`,text:`${A[2]}${quote(e.con)}的情況？`}]});
+    });
+    if(layer==="sun") G.modes.forEach((m,i)=>out.push({group:`${["🚀","⚓","🌀"][i]} ${m.name}`,el:["fire","air","water"][i],entries:[
+        {id:`sun:gen:${m.key}:0`,text:`我近來是否有這樣的表現：${quote(m.real)}？`},
+        {id:`sun:gen:${m.key}:1`,text:`我是否在行動中展現過${quote(m.pro)}？`},
+        {id:`sun:gen:${m.key}:2`,text:`我是否察覺過${quote(m.con)}的傾向？`}]}));
+    return out;
+  }
+  const s=bySlug[slug], d=s[layer]; if(!d) return null;
+  const grp=(icon,title,pre,text,key,post)=>{ const ss=sents(text); if(!ss.length) return;
+    out.push({group:`${icon} ${title}`,el:EL[s.element],entries:ss.map((x,i)=>({id:`${layer}:${slug}:${key}:${i}`,text:`${pre}${quote(x)}${post||"？"}`}))}); };
+  if(layer==="sun"){
+    out.push({group:"🏷️ 關鍵詞",el:EL[s.element],entries:d.keywords.split("、").map((k,i)=>({id:`sun:${slug}:kw:${i}`,text:`近來生活中，我是否看見「${k}」這個主題？`}))});
+    grp("✨","正面特質","我是否觀察到自己有這樣的表現：",d.positive,"pos");
+    grp("🌑","陰影／挑戰","我是否觀察到自己有這樣的傾向（只需留意，不必批判）：",d.shadow,"shd");
+    grp("💗","情緒表達","處理情緒時，我是否：",d.emotion,"emo");
+    grp("💬","溝通風格","與人溝通時，我是否：",d.communication,"com");
+    grp("🧭","決策與行動","做決定與行動時，我是否：",d.decision,"dec");
+    grp("⚡","壓力反應","感到壓力時，我是否：",d.stress,"str");
+  } else if(layer==="moon"){
+    grp("🫶","核心需求","我是否感受到自己有這樣的需求：",d.need,"need");
+    grp("🏡","安全感來源","我是否發現自己的安全感來自：",d.security,"sec");
+    grp("💗","情緒表達方式","我表達情緒時，是否：",d.expression,"exp");
+    grp("🌑","陰影面","我是否觀察到自己有這樣的傾向（只需留意，不必批判）：",d.shadow,"shd");
+    const sun=sunSlug&&bySlug[sunSlug];
+    if(sun){
+      const re=new RegExp("^若太陽(?:也)?是[^，]*"+sun.element), hit=sents(d.withSun).filter(x=>re.test(x));
+      if(hit.length) out.push({group:`☀️ 與我的太陽（${sun.zh}）的互動`,el:EL[sun.element],entries:hit.map((x,i)=>({id:`moon:${slug}:ws:${sunSlug}:${i}`,text:`我是否觀察到：${quote(x)}？`}))});
+    }
+  } else {
+    grp("🎭","外在氣質","別人是否常覺得我：",d.aura,"aura");
+    grp("👋","第一印象","別人對我的第一印象，是否：",d.first,"first");
+    grp("🤝","社交風格","在社交場合，我是否：",d.social,"soc");
+    const sun=sunSlug&&bySlug[sunSlug];
+    if(sun){
+      const re=new RegExp("^若太陽(?:屬於|同屬)[^，]*"+sun.element+"象"), hit=sents(d.gap).filter(x=>re.test(x));
+      if(hit.length) out.push({group:`☀️ 與我的太陽（${sun.zh}）的落差`,el:EL[sun.element],entries:hit.map((x,i)=>({id:`rising:${slug}:gap:${sunSlug}:${i}`,text:`我是否觀察到：${quote(x)}？`}))});
+    }
+  }
+  return out;
+}
+function viewChecklist(args){
+  const st=clLoad();
+  let tab=CL_LAYERS.some(l=>l.k===args[0])?args[0]:"sun";
+  const pick=k=>(typeof st.p[k]==="string"&&bySlug[st.p[k]])?st.p[k]:"";
+  app.innerHTML=`<div class="view" id="cl-root">
+   <div class="crumbs"><a class="btn" href="#/">← 返回星盤</a></div>
+   <section class="block" style="padding-top:14px">
+    <div class="sec-h"><div><h2 class="sec-t">📝 自我觀察清單</h2>
+     <p class="sec-s">把太陽、月亮、上升的描述變成觀察問題。勾選你近來在生活中真正留意到的表現，沒有對錯，也不必全部勾滿。</p></div>
+     <div class="chips" id="cl-acts"><a class="btn primary" href="#/checklist/result" id="cl-result">📊 查看結果</a><button class="chip" type="button" id="cl-reset">🔄 重設全部</button></div></div>
+    <div class="note" style="margin-top:0">⚠️ 這是自我反思工具，不是預測，也不是診斷。內容來自傳統占星的描述性整理，勾選結果僅供你自己覺察，不代表任何命運或必然結論。</div>
+    <div class="cl-top panel"><div class="ring-p" id="cl-ring" role="img" aria-label="總進度"><b id="cl-pct">0%</b></div>
+      <div><b id="cl-sum">總進度</b><div class="bar" aria-hidden="true"><i id="cl-bar"></i></div><p class="sec-s" id="cl-msg" style="margin-top:8px"></p><a class="btn primary" style="margin-top:10px" href="#/checklist/result">📊 查看結果（隨時可看）</a></div></div>
+    <div class="cl-pick">
+     ${CL_LAYERS.map(l=>`<div class="sel"><label for="cl-sel-${l.k}">${l.icon} 我的${l.name}星座</label><select id="cl-sel-${l.k}"><option value="">— 通用（不指定）—</option>${S.map(s=>`<option value="${s.slug}"${pick(l.k)===s.slug?" selected":""}>${s.glyph} ${s.zh}</option>`).join("")}</select></div>`).join("")}
+    </div>
+    <p class="sec-s" style="margin:8px 2px 0">不指定星座時，會根據 Chapter 1 的元素與模式描述提問；選擇星座後，題目會改用該星座自己的 Notion 內容。</p>
+    <div class="tabs cl-tabs" role="tablist" aria-label="三個層次">
+     ${CL_LAYERS.map(l=>`<button class="tab" role="tab" id="cl-tab-${l.k}" aria-selected="${l.k===tab}" aria-controls="cl-panel" data-t="${l.k}" tabindex="${l.k===tab?0:-1}">${l.icon} ${l.name} <small id="cl-cnt-${l.k}">0/0</small></button>`).join("")}
+    </div>
+    <div id="cl-panel" class="tp" role="tabpanel"></div>
+   </section></div>`;
+  const itemsFor=l=>clItems(l.k,pick(l.k),pick("sun"));
+  function counts(){
+    let all=0,done=0;
+    CL_LAYERS.forEach(l=>{ const it=itemsFor(l)||[]; let a=0,c=0; it.forEach(g=>g.entries.forEach(e=>{a++; if(st.c[e.id])c++;}));
+      $("#cl-cnt-"+l.k).textContent=c+"/"+a; all+=a; done+=c; });
+    const pct=all?Math.round(done/all*100):0;
+    $("#cl-pct").textContent=pct+"%"; $("#cl-ring").style.setProperty("--p",pct); $("#cl-bar").style.width=pct+"%";
+    $("#cl-sum").textContent=`總進度：已觀察 ${done} / ${all} 項`;
+    $("#cl-msg").textContent = done===0?"從任何一項開始都可以。":pct>=100?"🎉 全部觀察完成，記得這只是自我反思的起點。":"做得好，繼續留意自己的日常就好。";
+  }
+  function panel(){
+    const l=CL_LAYERS.find(x=>x.k===tab), p=$("#cl-panel"), slug=pick(l.k), it=itemsFor(l);
+    $$(".cl-tabs .tab").forEach(b=>{const on=b.dataset.t===tab; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1;});
+    p.setAttribute("aria-labelledby","cl-tab-"+tab);
+    let h=`<div class="cl-hint"><b>${l.icon} ${l.name}</b>（${l.meaning}）核心問題：${esc(l.q)}${slug?`<br>目前依據：${bySlug[slug].glyph} ${esc(bySlug[slug].zh)}的${l.name}內容`:"<br>目前依據：Chapter 1 的元素與模式描述（可在上方選擇星座）"}</div>`;
+    if(!it) h+=wip(`${bySlug[slug].zh}的${l.name}星座`);
+    else {
+      it.forEach(g=>{ h+=`<div class="cl-group" ${g.el?`data-el="${g.el}"`:""}><h3>${esc(g.group)}</h3>`+g.entries.map(e=>`<label class="cl-item"><input type="checkbox" data-id="${esc(e.id)}"${st.c[e.id]?" checked":""}><span class="cl-box" aria-hidden="true">✓</span><span class="cl-tx">${esc(e.text)}</span></label>`).join("")+`</div>`; });
+      if((tab==="moon"||tab==="rising")&&slug&&!pick("sun")) h+=`<div class="cl-hint">💡 同時選擇太陽星座，這裡會多出「${tab==="moon"?"月亮與太陽的互動":"上升與太陽的落差"}」觀察項。</div>`;
+    }
+    p.innerHTML=h; p.style.animation="none"; void p.offsetWidth; p.style.animation="";
+    $$("#cl-panel input[type=checkbox]").forEach(cb=>cb.addEventListener("change",()=>{
+      if(cb.checked) st.c[cb.dataset.id]=1; else delete st.c[cb.dataset.id];
+      clSave(st); const before=$("#cl-cnt-"+tab).textContent; counts();
+      const [a,b]=$("#cl-cnt-"+tab).textContent.split("/"); if(cb.checked&&a===b&&b!=="0") toast("🎉 "+l.icon+l.name+"層已全部觀察完成");
+    }));
+    document.querySelectorAll("#cl-panel .cl-group").forEach(()=>{});
+    counts();
+  }
+  $$(".cl-tabs .tab").forEach((b,k,arr)=>{
+    b.addEventListener("click",()=>{tab=b.dataset.t; softHash("#/checklist/"+tab,false); panel();});
+    b.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ const n=arr[(k+(e.key==="ArrowRight"?1:2))%3]; n.click(); n.focus(); } });
+  });
+  CL_LAYERS.forEach(l=>$("#cl-sel-"+l.k).addEventListener("change",e=>{ st.p[l.k]=e.target.value; clSave(st); panel(); }));
+  function resetAsk(){
+    const box=$("#cl-acts"); const keep=box.innerHTML;
+    box.innerHTML=`<span style="align-self:center">確定要清除所有勾選、星座選擇與上次結果紀錄嗎？</span><button class="chip" type="button" id="cl-yes" style="background:#ff8aa8;color:#10102a">確定重設</button><button class="chip" type="button" id="cl-no">取消</button>`;
+    $("#cl-yes").addEventListener("click",()=>{ st.c={}; st.p={}; st.snap=null; st.prev=null; clSave(st); viewChecklist([tab]); toast("已重設"); });
+    $("#cl-no").addEventListener("click",()=>{ box.innerHTML=keep; $("#cl-reset").addEventListener("click",resetAsk); });
+    $("#cl-no").focus();
+  }
+  $("#cl-reset").addEventListener("click",resetAsk);
+  panel(); document.title="自我觀察清單 · 星空小宇宙";
+}
+
+
+/* ---------- checklist result page ---------- */
+function clTiers(pct){
+  if(pct<30) return {icon:"🌱",name:"重合較少",txt:"目前勾選的項目不多，表示你近期觀察到的表現，與所選描述重合的部分較少。描述只是一個參考框架，不必用來定義自己；你可以換一個層次或星座再看看，或隔一段時間重新觀察。"};
+  if(pct<=60) return {icon:"🌗",name:"部分重合",txt:"你近期的觀察與描述有部分重合，也有不少不符之處。同一份描述可能只說中你的某些面向，不妨留意哪些項目讓你有共鳴、哪些沒有。"};
+  return {icon:"🌕",name:"重合較多",txt:"你勾選了較多項目，表示你近期的狀態與這些描述有相當程度的重合。這可以作為認識自己的一個線索，但仍需要結合日常生活中的具體經驗來思考。"};
+}
+const pad2=n=>String(n).padStart(2,"0");
+function fmtTime(ms){ const d=new Date(ms); if(isNaN(d.getTime())) return ""; return `${d.getFullYear()}/${pad2(d.getMonth()+1)}/${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
+const DAY_MS=24*60*60*1000;
+function sameSnap(a,b){ return !!(a&&b&&a.o===b.o&&a.l.sun===b.l.sun&&a.l.moon===b.l.moon&&a.l.rising===b.l.rising); }
+function deltaTxt(d){ return d>0?`+${d}%`:d<0?`-${Math.abs(d)}%`:"±0%"; }
+function deltaCls(d){ return d>0?"up":d<0?"down":"same"; }
+
+/* snapshot logic: returns {base, first}; saves only when numbers changed or the old snapshot is over a day old */
+function clSnapshot(st,cur){
+  try{
+    const snap=st.snap, prev=st.prev;
+    if(!snap){ st.snap=cur; st.prev=null; clSave(st); return {base:null,first:true}; }
+    if(!sameSnap(snap,cur)){ st.prev=snap; st.snap=cur; clSave(st); return {base:snap,first:false}; }
+    if(cur.t-snap.t>DAY_MS||snap.t>cur.t+DAY_MS){ st.prev=snap; st.snap=cur; clSave(st); return {base:snap,first:false}; }
+    return {base:prev||null,first:false,unchanged:true};
+  }catch(e){ return {base:null,first:true}; }
+}
+
+/* ---- share image (canvas, no libraries) ---- */
+function wrapLines(ctx,text,maxW){
+  const out=[]; let line="";
+  for(const ch of String(text)){ const test=line+ch; if(ctx.measureText(test).width>maxW&&line){ out.push(line); line=ch; } else line=test; }
+  if(line) out.push(line); return out;
+}
+function rrect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
+const EL_COL={"火":["#ff7a45","#ffc14d"],"土":["#4fc47f","#d8b86a"],"風":["#52c7ff","#b79cff"],"水":["#7a8cff","#d27dff"]};
+const TAGLINES={
+  low:["不必勉強符合任何描述","你比任何描述都更立體","留一點空間給真實的自己","描述只是參考，你才是主角","這次，也許只是看見不同的面向"],
+  mid:["有共鳴，也有留白","部分相似，部分屬於你自己","一半是描述，一半是你","找到幾處共鳴，也保留幾處不同","相似與相異，都是認識自己的線索"],
+  high:["有不少地方讓你點頭","這次出現了許多共鳴時刻","描述與近況有不少重合","留意這些共鳴，也保持好奇","共鳴不少，別忘了保留自己的想法"]
+};
+const INVITES=["你也來看看你的星空吧","想知道你的星空是什麼樣子嗎？來看看吧","你的星空，也值得被看見","一起來探索你的太陽、月亮與上升","來看看你的 Big Three 是什麼組合","有空的話，也來觀察一下你自己吧"];
+function tierKey(pct){ return pct<30?"low":pct<=60?"mid":"high"; }
+function dominantElements(slugs){
+  const cnt={}; slugs.forEach(sl=>{ const e=bySlug[sl].element; cnt[e]=(cnt[e]||0)+1; });
+  const mx=Math.max(0,...Object.values(cnt)); return Object.keys(cnt).filter(e=>cnt[e]===mx);
+}
+function siteUrl(){ try{ if(/^https?:$/.test(location.protocol)) return location.origin+location.pathname+location.search; }catch(e){} return ""; }
+function buildShareInfo(rows,pct,tier,pickF){
+  const signs=CL_LAYERS.map(l=>{ const sl=pickF(l.k); return {layer:l.name,icon:l.icon,slug:sl,s:sl?bySlug[sl]:null}; });
+  const chosen=signs.filter(x=>x.s).map(x=>x.slug);
+  const elems=chosen.length?dominantElements(chosen):[];
+  const tl=TAGLINES[tierKey(pct)], tagline=tl[Math.floor(Math.random()*tl.length)];
+  const invite=INVITES[Math.floor(Math.random()*INVITES.length)], url=siteUrl();
+  const text=["✨ 我在「星空小宇宙」做了星座自我觀察 ✨",
+    ...signs.map(x=>`${x.icon} ${x.layer}：${x.s?x.s.glyph+" "+x.s.zh:"未指定"}`),
+    `與星座描述的整體相似度：${pct}%`,tagline,
+    elems.length?`主要元素：${elems.map(e=>e+"象").join("、")}`:"",
+    "※ 僅供自我反思參考，不代表準確度；根據巴納姆效應，寬泛的描述容易讓人覺得貼合自己。",
+    `${invite}${url?"："+url:"（搜尋「星空小宇宙」）"}`].filter(Boolean).join("\n");
+  return {pct,tier,tagline,invite,url,signs,elems,text};
+}
+function shareCardHTML(info){
+  const svg=`<svg class="sc-const" viewBox="0 0 200 120" aria-hidden="true" focusable="false"><polyline points="12,92 48,58 86,70 124,30 168,46 186,14" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/><g fill="#fff"><circle cx="12" cy="92" r="2.2"/><circle cx="48" cy="58" r="3"/><circle cx="86" cy="70" r="2"/><circle cx="124" cy="30" r="3.2"/><circle cx="168" cy="46" r="2"/><circle cx="186" cy="14" r="2.6"/></g></svg>`;
+  return `<div class="share-card" id="share-card" role="group" aria-label="分享卡片">${svg}
+    <div class="sc-brand">✦ 星空小宇宙<br><span>星座自我觀察結果</span></div>
+    <div class="sc-signs">${info.signs.map(x=>x.s?`<div class="sc-sign" data-el="${EL[x.s.element]}"><div class="sc-g" aria-hidden="true">${x.s.glyph}</div><div class="sc-l">${x.icon} ${x.layer}</div><div class="sc-n">${esc(x.s.zh)}</div></div>`:`<div class="sc-sign none"><div class="sc-g" aria-hidden="true">·</div><div class="sc-l">${x.icon} ${x.layer}</div><div class="sc-n">未指定</div></div>`).join("")}</div>
+    <div class="sc-lab">與星座描述的整體相似度</div><div class="sc-pct">${info.pct}<small>%</small></div>
+    <div class="sc-tag">${esc(info.tagline)}</div>
+    ${info.elems.length?`<div class="sc-el"><span>主要元素</span>${info.elems.map(e=>`<b class="el-badge" data-el="${EL[e]}">${EL_EMO[e]} ${e}象</b>`).join("")}</div>`:""}
+    <div class="sc-inv">${esc(info.invite)}</div>
+    <div class="sc-foot">僅供自我反思參考，不代表準確度</div></div>`;
+}
+function drawShareCanvas(info){
+  const W=1080,H=1440, c=document.createElement("canvas"); c.width=W; c.height=H;
+  const x=c.getContext("2d"); if(!x) throw new Error("no 2d context");
+  const SANS='"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC","Source Han Sans TC",sans-serif';
+  const SERIF='"Noto Serif TC","Songti TC","PMingLiU","Source Han Serif TC",serif';
+  const SYM='"Segoe UI Symbol","Noto Sans Symbols","Noto Sans Symbols 2","Apple Symbols","DejaVu Sans",sans-serif';
+  const fit=(txt,maxW,start,min,weight,fam)=>{ let s=start; x.font=`${weight} ${s}px ${fam}`; while(x.measureText(txt).width>maxW&&s>min){ s-=2; x.font=`${weight} ${s}px ${fam}`; } return s; };
+  let g=x.createLinearGradient(0,0,W*.6,H); g.addColorStop(0,"#1a1150"); g.addColorStop(.7,"#0b0b2b"); g.addColorStop(1,"#070718"); x.fillStyle=g; x.fillRect(0,0,W,H);
+  let r=x.createRadialGradient(W*.9,H*.05,10,W*.9,H*.05,560); r.addColorStop(0,"rgba(255,154,90,.38)"); r.addColorStop(1,"rgba(255,154,90,0)"); x.fillStyle=r; x.fillRect(0,0,W,H);
+  r=x.createRadialGradient(W*.05,H*.97,10,W*.05,H*.97,600); r.addColorStop(0,"rgba(82,199,255,.3)"); r.addColorStop(1,"rgba(82,199,255,0)"); x.fillStyle=r; x.fillRect(0,0,W,H);
+  let seed=11; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  for(let i=0;i<140;i++){ x.fillStyle=`rgba(255,255,255,${.2+rnd()*.6})`; x.beginPath(); x.arc(rnd()*W,rnd()*H,rnd()*2+.4,0,6.283); x.fill(); }
+  const pts=[[700,150],[780,110],[850,160],[930,95],[1000,140]]; x.strokeStyle="rgba(255,255,255,.35)"; x.lineWidth=2; x.beginPath(); pts.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1])); x.stroke();
+  pts.forEach((q,i)=>{ x.fillStyle="#fff"; x.beginPath(); x.arc(q[0],q[1],i%2?5:3.5,0,6.283); x.fill(); });
+  x.strokeStyle="rgba(255,255,255,.3)"; x.lineWidth=3; rrect(x,30,30,W-60,H-60,48); x.stroke();
+  x.textBaseline="alphabetic"; x.textAlign="left"; x.fillStyle="#ffffff"; x.font=`900 44px ${SERIF}`; x.fillText("✦ 星空小宇宙",90,130);
+  x.fillStyle="#cfcaf5"; x.font=`500 30px ${SANS}`; x.fillText("星座自我觀察結果",90,178);
+  const cx=[210,540,870];
+  info.signs.forEach((sg,i)=>{
+    x.textAlign="center";
+    x.fillStyle=sg.s?EL_COL[sg.s.element][1]:"rgba(255,255,255,.35)"; x.font=`400 150px ${SYM}`; x.fillText(sg.s?sg.s.glyph:"·",cx[i],380);
+    x.fillStyle="#cfcaf5"; x.font=`500 32px ${SANS}`; x.fillText(sg.layer,cx[i],445);
+    const nm=sg.s?sg.s.zh:"未指定"; x.fillStyle=sg.s?"#ffffff":"rgba(255,255,255,.6)"; fit(nm,290,54,28,"900",SERIF); x.fillText(nm,cx[i],515);
+  });
+  x.textAlign="center"; x.fillStyle="#cfcaf5"; x.font=`500 34px ${SANS}`; x.fillText("與星座描述的整體相似度",W/2,660);
+  const gp=x.createLinearGradient(240,0,840,0); gp.addColorStop(0,"#ffd27a"); gp.addColorStop(.5,"#ff8aa8"); gp.addColorStop(1,"#5ed0ff");
+  x.fillStyle=gp; x.font=`900 280px ${SERIF}`; const num=String(info.pct), nw=x.measureText(num).width; x.font=`900 110px ${SERIF}`; const pw=x.measureText("%").width;
+  const sx=W/2-(nw+pw+6)/2; x.textAlign="left"; x.font=`900 280px ${SERIF}`; x.fillText(num,sx,920); x.font=`900 110px ${SERIF}`; x.fillText("%",sx+nw+6,920);
+  x.textAlign="center"; x.fillStyle="#ffffff"; fit(info.tagline,W-220,48,28,"700",SERIF); x.fillText(info.tagline,W/2,1020);
+  if(info.elems.length){
+    x.font=`500 30px ${SANS}`; const lab="主要元素", lw=x.measureText(lab).width;
+    const bw=info.elems.map(e=>{ x.font=`700 32px ${SANS}`; return x.measureText(`${e}象`).width+90; });
+    const total=lw+28+bw.reduce((a,b)=>a+b,0)+16*(info.elems.length-1); let px=W/2-total/2;
+    x.textAlign="left"; x.fillStyle="#cfcaf5"; x.font=`500 30px ${SANS}`; x.fillText(lab,px,1120); px+=lw+28;
+    info.elems.forEach((e,i)=>{ const col=EL_COL[e]; const gg=x.createLinearGradient(px,0,px+bw[i],0); gg.addColorStop(0,col[0]); gg.addColorStop(1,col[1]);
+      x.fillStyle=gg; rrect(x,px,1078,bw[i],60,30); x.fill(); x.fillStyle="#10102a"; x.font=`700 32px ${SANS}`; x.fillText(`${e}象`,px+44,1120); px+=bw[i]+16; });
+  }
+  x.textAlign="center"; x.strokeStyle="rgba(255,255,255,.25)"; x.setLineDash([10,10]); x.lineWidth=2; x.beginPath(); x.moveTo(140,1190); x.lineTo(W-140,1190); x.stroke(); x.setLineDash([]);
+  x.fillStyle="#ffe9b8"; fit(info.invite,W-200,40,26,"700",SERIF); x.fillText(info.invite,W/2,1260);
+  x.fillStyle="#cfcaf5"; x.font=`500 30px ${SANS}`; x.fillText(info.url?"":"搜尋「星空小宇宙」或向分享的朋友索取連結",W/2,1310);
+  if(info.url){ x.fillStyle="#cfcaf5"; fit(info.url,W-200,28,16,"500",SANS); x.fillText(info.url,W/2,1310); }
+  x.fillStyle="#a9a5d6"; x.font=`400 26px ${SANS}`; x.fillText("僅供自我反思參考，不代表準確度",W/2,1370);
+  return c;
+}
+
+/* ---- 個人化總結：根據所選星座的 Notion 文字與整體相似度，在瀏覽器中組合一段概括描述 ---- */
+const rPick=a=>a[Math.floor(Math.random()*a.length)];
+const firstSent=t=>String(t||"").split(/[。\n]/)[0].trim();
+const listOf=t=>firstSent(t).split("、").map(x=>x.trim()).filter(x=>x&&x.length<=9);
+function sampleN(arr,n){ const a=arr.slice(),o=[]; while(o.length<n&&a.length) o.push(a.splice(Math.floor(Math.random()*a.length),1)[0]); return o; }
+const PS={
+  sun:[T=>`你大致是個${T}的人。`,T=>`整體來說，你的核心帶著${T}的氣質。`,T=>`簡單形容的話，你可能是${T}的人。`,T=>`在你的核心裡，${T}是頗為鮮明的色彩。`,T=>`從太陽的描述來看，你身上帶有${T}的特質。`,T=>`如果用幾個詞來形容你，也許會是：${T}。`],
+  sunKw:[K=>`${K}，是描述你核心色彩時常見的關鍵詞。`,K=>`你大致是這樣的人：身上常被連結到${K}這些主題。`,K=>`你的核心，似乎和${K}這些關鍵詞特別有緣。`],
+  moon:[N=>`內心深處，你可能${N}。`,N=>`在情感與安全感方面，你大概${N}。`,N=>`私下的你，或許${N}。`,N=>`你的內在世界，可能${N}。`,N=>`當你放鬆下來時，內心也許${N}。`,N=>`說到情緒，你似乎${N}。`],
+  rising:[X=>`在他人眼中，你可能給人${X}的感覺。`,X=>`初次見面時，別人或許會覺得你${X}。`,X=>`你給外界的第一印象，大概是${X}。`,X=>`在人群裡，你可能呈現出${X}的一面。`,X=>`旁人看你，也許會看到${X}。`,X=>`外在的你，往往讓人感到${X}。`],
+  elem:[(E,T)=>`整體的元素傾向偏${E}，帶有${T}的色彩。`,(E,T)=>`從元素來看，${E}的氣質（${T}）在你的組合中比較明顯。`,(E,T)=>`你的星座組合以${E}為主，${T}的能量可能較為突出。`,(E,T)=>`${E}的色彩在你的組合裡較濃，常見的關鍵詞有${T}。`,(E,T)=>`若以元素描述，你偏向${E}，也就是${T}。`,(E,T)=>`${E}佔了較大的比重，描述中常見${T}等字眼。`],
+  elemMix:[(E,T)=>`你的組合涵蓋${E}，彼此帶來不同的色彩，例如${T}。`,(E,T)=>`從元素來看，${E}並存於你的組合中，描述裡常見${T}等字眼。`,(E,T)=>`${E}在你的組合裡各有位置，也許讓你同時擁有${T}的不同面向。`,(E,T)=>`你的星座組合橫跨${E}，這可能讓你的風格較為多元，常見的關鍵詞有${T}。`,(E,T)=>`${E}交織在你的組合中，帶來${T}等不同的色彩。`],
+  none:["你還沒有指定星座，所以只能給出很概括的描繪：願意花時間觀察自己的人，通常也願意溫柔地對待自己。","由於尚未選擇星座，這裡無法描繪更具體的輪廓；不過願意停下來看看自己，本身就是很好的開始。","沒有指定星座時，描述只能停留在大方向：你是一個正在認識自己的人，這樣就很好。","你尚未選擇星座，所以這段文字比較概括：你是個願意用不同角度看自己的人。","未指定星座的情況下，只能說得很籠統：你正在用心觀察自己，這份用心值得被肯定。","目前沒有選擇星座，輪廓還不夠具體，但你願意回頭整理自己的感受，這一點已經很可貴。"],
+  tier:{
+    low:["這次你勾選的項目不多，所以這個輪廓只是其中一種可能，不必對號入座。","與你近期的勾選相比，這樣的描繪重合不多，這很正常，你本來就比任何描述都更立體。","你的勾選與描述的重疊不算多，這份概括僅供參考，真正的你仍然由你自己定義。","因為重合偏少，這段描繪只能當作一個輕輕的提問：真正的你，是否還有其他面向？","重合不多並不奇怪，描述原本就無法適合每一個人。","這段文字與你近期的狀態距離較遠，把它當作另一種看待自己的角度就好。"],
+    mid:["你的勾選顯示有些地方很貼近，有些地方並不像，這正好說明你比任何描述都更立體。","這個輪廓與你有一部分重疊，也有留白，剛好留給你自己補上。","有共鳴也有不同，這樣的結果很自然，也是認識自己的好材料。","你與這段描繪既有相似也有差異，不妨留意哪些地方讓你點頭、哪些讓你搖頭。","部分貼近、部分不像，代表你並沒有被任何描述框住。","重疊與差異並存，這樣的你，比一份概括的文字更加豐富。"],
+    high:["你勾選了不少項目，表示這個輪廓與你近期的感受有許多交集；不過寬泛的描述本來就容易讓人覺得貼合，所以仍宜當作線索。","這次共鳴不少，可以想想這些共鳴在生活裡是怎麼出現的，也別忘了保留一點好奇與懷疑。","重合偏高讓人安心，但請記得，這是你自己的觀察，並不能證明描述一定準確。","你認同了許多描述，這很適合作為自我整理的起點，而不是定論。","這個輪廓與你近期的狀態相當接近，不妨把它當作一面鏡子，而不是一張標籤。","有不少共鳴，說明這份描繪給了你一些語言去談論自己，這就已經很有價值。"]},
+  closing:["這只是自我反思的參考，不是預測。","請把它當作一個起點，而不是定論。","占星是看見自己的一面鏡子，不是對未來的判決。","別忘了，你比任何描述都更了解自己。","這些文字僅供參考，願你多留意自己的真實感受。","慢慢來，認識自己本來就不需要答案。","不必勉強符合任何描述，做你自己就好。"]
+};
+let lastSumText="";
+function genPersonality(info,pct){
+  const [sunI,moonI,risI]=info.signs, cand=[];
+  if(sunI.s&&sunI.s.sun){
+    const tr=sampleN(listOf(sunI.s.sun.positive),3), kw=sampleN(sunI.s.sun.keywords.split("、").filter(Boolean),3);
+    const opts=[]; if(tr.length>=2) PS.sun.forEach(f=>opts.push(()=>f(tr.join("、")))); if(kw.length>=2) PS.sunKw.forEach(f=>opts.push(()=>f(kw.map(k=>`「${k}」`).join("、"))));
+    if(opts.length) cand.push({k:"sun",s:rPick(opts)()});
+  }
+  if(moonI.s&&moonI.s.moon){ let n=firstSent(moonI.s.moon.need).split("，")[0]; if(n.indexOf("需要")===0){ n=n.split("、").slice(0,2).map(z=>z.replace(/^以及/,"")).join("、"); if(n.length<=40) cand.push({k:"moon",s:rPick(PS.moon)(n)}); } }
+  if(risI.s&&risI.s.rising){ const x=firstSent(risI.s.rising.first).split("，")[0]; if(x&&x.length<=30) cand.push({k:"rising",s:rPick(PS.rising)(x)}); }
+  if(info.elems.length){
+    const names=info.elems.map(e=>e+"象"), E=names.length>1?names.slice(0,-1).join("、")+"與"+names[names.length-1]:names[0], per=info.elems.length>1?1:3;
+    const tr=info.elems.flatMap(e=>{ const g=G.elements.find(z=>z.key===e); return g?sampleN(listOf(g.desc),per):[]; });
+    if(tr.length) cand.push({k:"elem",s:rPick(info.elems.length>1?PS.elemMix:PS.elem)(E,tr.join("、"))});
+  }
+  let picked=cand;
+  if(cand.length>3){ const drop=rPick(cand.filter(c=>c.k!=="sun")); picked=cand.filter(c=>c!==drop); }
+  if(Math.random()<.35) picked=sampleN(picked,picked.length);
+  const sents=picked.map(c=>c.s);
+  if(!sents.length) sents.push(rPick(PS.none));
+  sents.push(rPick(PS.tier[tierKey(pct)]), rPick(PS.closing));
+  return sents.join("");
+}
+function genSummary(info,pct){
+  let s,tries=0; do{ s=genPersonality(info,pct); tries++; } while(s===lastSumText&&tries<10);
+  lastSumText=s; return s;
+}
+
+function viewChecklistResult(){
+  const st=clLoad();
+  const pick=k=>(typeof st.p[k]==="string"&&bySlug[st.p[k]])?st.p[k]:"";
+  let all=0,done=0; const rows=CL_LAYERS.map(l=>{
+    const slug=pick(l.k), it=clItems(l.k,slug,pick("sun"))||[]; let a=0,c=0;
+    it.forEach(g=>g.entries.forEach(e=>{a++; if(st.c[e.id])c++;}));
+    all+=a; done+=c; return {l,slug,a,c,pct:a?Math.round(c/a*100):0};
+  });
+  const pct=all?Math.round(done/all*100):0;
+  const kind=`<div class="kind"><h3>💌 給你的一句話</h3><p>占星是一種自我反思的工具，而不是定論。即使相似度偏低，也不代表你「不像」自己的星座，更不代表你有任何問題——這些描述本來就無法適合每一個人。</p></div>`;
+  const explore=`<h3 style="font-family:var(--serif);margin:26px 0 0">🧭 探索更多</h3>
+    <div class="explore"><a class="btn" href="#/mix">🎴 Big Three 組合器</a><a class="btn" href="#signs">🪐 瀏覽其他星座</a><a class="btn" href="#/elements">🔥 元素與模式</a></div>`;
+  const head=`<div class="crumbs"><a class="btn" href="#/checklist">← 回到清單</a></div>
+    <section class="block" style="padding-top:14px"><h2 class="sec-t">📊 觀察結果</h2>
+    <p class="sec-s">以下是你勾選項目的相似度摘要，僅供自我反思參考。</p>`;
+  let body, info=null;
+  if(done===0){
+    body=`<div class="panel rs-empty"><div style="font-size:2.6rem" aria-hidden="true">🔭</div>
+      <h3 style="font-family:var(--serif);margin:6px 0">目前還沒有勾選任何項目</h3>
+      <p class="sec-s">先到清單看看哪些描述符合你近期的觀察，再回來查看結果。</p>
+      <a class="btn primary" href="#/checklist">前往清單開始觀察 →</a></div>${kind}${explore}`;
+  } else {
+    const tier=clTiers(pct);
+    info=buildShareInfo(rows,pct,tier,pick);
+    const cur={t:Date.now(),o:pct,l:{sun:rows[0].pct,moon:rows[1].pct,rising:rows[2].pct}};
+    const snap=clSnapshot(st,cur), base=snap.base;
+    let cmp;
+    if(snap.first) cmp=`<div class="rs-cmp same">這是你第一次查看結果，下次會與這次對照。</div>`;
+    else if(!base) cmp=`<div class="rs-cmp same">與上次查看的結果相同。</div>`;
+    else { const d=pct-base.o; cmp=`<div class="rs-cmp ${deltaCls(d)}">${d===0?"與上次相同（±0%）":`比上次 ${deltaTxt(d)}`}<small>上次：${base.o}%${fmtTime(base.t)?`　${fmtTime(base.t)}`:""}。變化只反映近期勾選的差異，不代表好壞。</small></div>`; }
+    const badge=(r,i)=>{ if(!base) return ""; const d=r.pct-base.l[LAYER_KEYS[i]]; return `<span class="rs-badge ${deltaCls(d)}">${d===0?"±0%":deltaTxt(d)}</span>`; };
+    body=`<div class="panel rs-all"><div class="rs-big" aria-label="整體相似度 ${pct}%">${pct}<small>%</small></div>
+        <div><b>整體相似度</b><div class="sec-s" style="margin:0">符合 ${done} / ${all} 項</div>
+        <div class="rs-bar" role="img" aria-label="整體相似度 ${pct}%"><i style="width:${pct}%"></i></div>${cmp}</div></div>
+      <div class="rs-rows">${rows.map((r,i)=>`<div class="panel rs-row" ${r.slug?`data-el="${EL[bySlug[r.slug].element]}"`:""}>
+        <div class="rs-rh"><b>${r.l.icon} ${r.l.name}</b><span class="sec-s" style="margin:0">${r.slug?esc(bySlug[r.slug].glyph+" "+bySlug[r.slug].zh):"通用（未指定星座）"}</span></div>
+        <div class="rs-bar" role="img" aria-label="${r.l.name}相似度 ${r.pct}%"><i style="width:${r.pct}%"></i></div>
+        <div class="rs-line">${r.a?`符合 ${r.c} / ${r.a} 項（${r.pct}%）`:"尚無項目"}${badge(r,i)}</div></div>`).join("")}</div>
+      <div class="panel rs-concl"><h3>${tier.icon} 結論：${esc(tier.name)}</h3><p>${esc(tier.txt)}</p>
+        <p class="rs-barnum">🧠 提醒：根據巴納姆效應，寬泛的描述容易讓幾乎任何人都覺得貼合自己，因此這個數字僅供自我反思參考，不能用來證明星座描述準確。</p></div>
+      <div class="panel sum-sec" id="sum-sec"><div class="rs-rh"><h3 style="font-family:var(--serif);margin:0">🌟 個人化總結</h3><button class="chip" type="button" id="sum-again">🔄 換一種說法</button></div>
+        <div id="sum-box" class="sum-box" aria-live="polite"></div>
+        <p class="sum-note">此段文字由頁面根據你選擇的星座（Notion 描述）與整體相似度，在你的瀏覽器中自動組合，每次的說法會略有不同，僅供自我反思參考，不是預測。</p></div>
+      <div class="share-sec"><h3 style="font-family:var(--serif);margin:0">🎁 分享卡片</h3>
+        ${shareCardHTML(info)}
+        <div class="sh-acts"><button class="btn primary" type="button" id="sh-copy">📋 複製分享文字</button><button class="btn" type="button" id="sh-dl">🖼️ 下載結果圖</button></div>
+        <div class="sh-msg" id="sh-msg" role="status" aria-live="polite"></div>
+        <p class="sh-hint">分享時會附上一句邀請語：「${esc(info.invite)}」</p>
+        <div id="sh-extra"></div></div>
+      ${kind}${explore}
+      <div class="row-act"><a class="btn primary" href="#/checklist">繼續觀察 →</a></div>`;
+  }
+  app.innerHTML=`<div class="view" id="rs-root">${head}${body}</section></div>`;
+  document.title="觀察結果 · 星空小宇宙";
+  if(!info) return;
+
+  function renderSummary(){
+    const box=$("#sum-box"); if(!box) return;
+    let s; try{ s=genSummary(info,pct); }catch(e){ s="目前無法產生個人化總結，請稍後再試，或直接參考上方的結果與結論。"; }
+    box.innerHTML=`<p>${esc(s)}</p>`;
+    box.style.animation="none"; void box.offsetWidth; box.style.animation="";
+  }
+  renderSummary(); $("#sum-again").addEventListener("click",renderSummary);
+  const msg=(txt,cls)=>{ const m=$("#sh-msg"); if(m){ m.textContent=txt; m.className="sh-msg "+(cls||""); } };
+  function showTextarea(note){
+    const ex=$("#sh-extra"); ex.innerHTML=`<textarea class="sh-ta" id="sh-ta" readonly aria-label="分享文字（可選取後手動複製）"></textarea>`;
+    const ta=$("#sh-ta"); ta.value=info.text; ta.focus(); ta.select(); try{ ta.setSelectionRange(0,ta.value.length); }catch(e){}
+    msg(note||"無法自動複製，請長按或選取下方文字後手動複製。","err");
+  }
+  $("#sh-copy").addEventListener("click",()=>{
+    const done=()=>{ msg("已複製分享文字 ✓","ok"); toast("已複製分享文字 ✓"); const ex=$("#sh-extra"); if(ex) ex.innerHTML=""; };
+    const legacy=()=>{
+      let okc=false;
+      try{ const ta=document.createElement("textarea"); ta.value=info.text; ta.setAttribute("readonly",""); ta.style.cssText="position:fixed;left:0;top:0;opacity:0;"; document.body.appendChild(ta); ta.select(); try{ta.setSelectionRange(0,ta.value.length);}catch(e){} okc=!!document.execCommand("copy"); ta.remove(); }catch(e){ okc=false; }
+      if(okc) done(); else showTextarea();
+    };
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText&&window.isSecureContext){ navigator.clipboard.writeText(info.text).then(done,legacy); }
+      else legacy();
+    }catch(e){ legacy(); }
+  });
+  $("#sh-dl").addEventListener("click",()=>{
+    msg("正在產生圖片……");
+    const fin=()=>{
+      let canvas; try{ canvas=drawShareCanvas(info); }catch(e){ msg("無法產生圖片，請改用「複製分享文字」或直接截圖保存。","err"); return; }
+      const name=`星座觀察結果-${new Date().getFullYear()}${pad2(new Date().getMonth()+1)}${pad2(new Date().getDate())}.png`;
+      let dataUrl=""; try{ dataUrl=canvas.toDataURL("image/png"); }catch(e){}
+      const preview=()=>{ if(dataUrl){ $("#sh-extra").innerHTML=`<img class="sh-prev" alt="分享結果圖預覽" src="${dataUrl}">`; } };
+      const trigger=(href)=>{ try{ const a=document.createElement("a"); a.href=href; a.download=name; a.rel="noopener"; document.body.appendChild(a); a.click(); a.remove(); return true; }catch(e){ return false; } };
+      try{
+        canvas.toBlob(blob=>{
+          let started=false;
+          if(blob){ try{ const u=URL.createObjectURL(blob); started=trigger(u); setTimeout(()=>{try{URL.revokeObjectURL(u)}catch(e){}},8000); }catch(e){} }
+          if(!started&&dataUrl) started=trigger(dataUrl);
+          if(started||dataUrl){ preview(); msg(started?"已開始下載結果圖 ✓　若沒有自動下載，請長按下方圖片儲存。":"請長按下方圖片儲存。", started?"ok":""); }
+          else msg("無法產生圖片，請改用「複製分享文字」或直接截圖保存。","err");
+        },"image/png");
+      }catch(e){
+        if(dataUrl&&trigger(dataUrl)){ preview(); msg("已開始下載結果圖 ✓　若沒有自動下載，請長按下方圖片儲存。","ok"); }
+        else if(dataUrl){ preview(); msg("請長按下方圖片儲存。",""); }
+        else msg("無法產生圖片，請改用「複製分享文字」或直接截圖保存。","err");
+      }
+    };
+    try{ if(document.fonts&&document.fonts.ready){ Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1200))]).then(fin,fin); } else fin(); }catch(e){ fin(); }
+  });
+}
+/* ---------- routing ---------- */
+function go(h){ if(location.hash===h) route(); else location.hash=h; }
+function randomSign(){ const s=S[Math.floor(Math.random()*12)]; go("#/"+s.slug); toast("🎲 抽到："+s.zh); }
+$("#rand").addEventListener("click",randomSign);
+function route(){
+  const parts=(location.hash||"#/").replace(/^#\/?/,"").split("/").filter(Boolean);
+  document.title="星空小宇宙 · 太陽・月亮・上升 星座互動圖鑑";
+  let nav="home";
+  if(!parts.length || parts[0]==="signs") { viewHome(); }
+  else if(parts[0]==="mix"){ nav="mix"; viewMix(parts.slice(1).map(x=>x==="_"?null:x)); }
+  else if(parts[0]==="elements"){ nav="elements"; viewElements(); }
+  else if(parts[0]==="checklist" && parts[1]==="result"){ nav="checklist"; viewChecklistResult(); }
+  else if(parts[0]==="checklist"){ nav="checklist"; viewChecklist(parts.slice(1)); }
+  else if(bySlug[parts[0]]){ nav=""; viewSign(parts[0],parts[1]); }
+  else { viewHome(); }
+  $$("[data-nav]").forEach(a=>{ if(a.dataset.nav===nav) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  if(!(location.hash==="#signs")) scrollTo({top:0,behavior:"auto"});
+  if(location.hash && !/^#\//.test(location.hash) && $(location.hash)) $(location.hash).scrollIntoView();
+}
+addEventListener("hashchange",()=>{ if(skipHash){ skipHash=false; return; } route(); });
+addEventListener("keydown",e=>{
+  if(e.target.closest&&e.target.closest("input,select,textarea")) return;
+  const parts=(location.hash||"").replace(/^#\/?/,"").split("/");
+  if(bySlug[parts[0]]&&(e.key==="ArrowLeft"||e.key==="ArrowRight")&&!e.target.closest('[role="tablist"]')){
+    const i=idx(parts[0]); go("#/"+S[(i+(e.key==="ArrowRight"?1:11))%12].slug);
+  }
+});
+route();
+})();
+</script>
+</body>
+</html>
