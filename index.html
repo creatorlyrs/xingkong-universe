@@ -1036,8 +1036,8 @@ function viewChecklistResult(){
       <div class="panel sum-sec" id="sum-sec"><div class="rs-rh"><h3 style="font-family:var(--serif);margin:0">🌟 個人化總結</h3><button class="chip" type="button" id="sum-again">🔄 換一種說法</button></div>
         <div id="sum-box" class="sum-box" aria-live="polite"></div>
         <p class="sum-note">此段文字由頁面根據你選擇的星座與整體相似度，在你的瀏覽器中自動組合，每次的說法會略有不同，僅供自我反思參考，不是預測。</p></div>
-      <div class="share-sec"><h3 style="font-family:var(--serif);margin:0">🎁 分享卡片</h3>
-        ${shareCardHTML(info)}
+      <div class="share-sec"><h3 style="font-family:var(--serif);margin:0">🎁 我的結果圖</h3>
+        <div id="sh-img"></div>
         <div class="sh-acts"><button class="btn primary" type="button" id="sh-copy">📋 複製分享文字</button><button class="btn" type="button" id="sh-dl">🖼️ 查看結果圖</button></div>
         <div class="sh-msg" id="sh-msg" role="status" aria-live="polite"></div>
         <p class="sh-hint">分享時會附上一句邀請語：「${esc(info.invite)}」</p>
@@ -1074,22 +1074,22 @@ function viewChecklistResult(){
       else legacy();
     }catch(e){ legacy(); }
   });
-  $("#sh-dl").addEventListener("click",()=>{
+  const genImg=(manual)=>{
     msg("正在產生圖片……");
     const fin=()=>{
       let canvas; try{ canvas=drawShareCanvas(info); }catch(e){ msg("無法產生圖片，請改用「複製分享文字」或直接截圖保存。","err"); return; }
       const name=`星座觀察結果-${new Date().getFullYear()}${pad2(new Date().getMonth()+1)}${pad2(new Date().getDate())}.png`;
       let dataUrl=""; try{ dataUrl=canvas.toDataURL("image/png"); }catch(e){}
-      const preview=()=>{ if(dataUrl){ $("#sh-extra").innerHTML=`<img class="sh-prev" alt="分享結果圖預覽" src="${dataUrl}">`; } };
-      const trigger=(href)=>{ try{ $("#sh-extra").innerHTML=`<img class="sh-prev" alt="分享結果圖，長按可儲存圖片" src="${href}">`; return true; }catch(e){ return false; } };
+      const preview=()=>{ if(dataUrl){ $("#sh-img").innerHTML=`<img class="sh-prev" alt="分享結果圖預覽" src="${dataUrl}">`; } };
+      const trigger=(href)=>{ try{ $("#sh-img").innerHTML=`<img class="sh-prev" alt="分享結果圖，長按可儲存圖片" src="${href}">`; return true; }catch(e){ return false; } };
       const isMobile=(()=>{ try{ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)||(window.matchMedia&&matchMedia("(pointer:coarse)").matches&&innerWidth<900); }catch(e){ return false; } })();
       if(dataUrl){
         // 手機：不強制下載成檔案，改為顯示可長按儲存的圖片，並提供系統分享（可選「儲存圖片」存到相簿）
         const show=(blob)=>{
           const canShare=!!(blob&&navigator.share&&navigator.canShare&&(()=>{ try{ return navigator.canShare({files:[new File([blob],name,{type:"image/png"})]}); }catch(e){ return false; } })());
-          $("#sh-extra").innerHTML=`<img class="sh-prev" alt="分享結果圖，長按可儲存圖片" src="${dataUrl}">`+(canShare?`<div class="sh-acts" style="justify-content:center;margin-top:12px"><button class="btn primary" type="button" id="sh-save">📲 儲存圖片／分享</button></div>`:"");
+          $("#sh-img").innerHTML=`<img class="sh-prev" alt="分享結果圖，長按可儲存圖片" src="${dataUrl}">`+(canShare?`<div class="sh-acts" style="justify-content:center;margin-top:12px"><button class="btn primary" type="button" id="sh-save">📲 儲存圖片／分享</button></div>`:"");
           if(canShare){ $("#sh-save").addEventListener("click",()=>{ try{ navigator.share({files:[new File([blob],name,{type:"image/png"})]}).catch(()=>{}); }catch(e){} }); }
-          msg(canShare?"請按「儲存圖片／分享」，在選單中選「儲存圖片」；也可以長按下方圖片（電腦請按右鍵），選「儲存圖片」或「加入照片」。":"請長按下方圖片（電腦請按右鍵），選擇「儲存圖片」或「加入照片」，即可存下圖片。","ok");
+          msg(canShare?"請按「儲存圖片／分享」，在選單中選「儲存圖片」；也可以長按上方圖片（電腦請按右鍵），選「儲存圖片」或「加入照片」。":"請長按上方圖片（電腦請按右鍵），選擇「儲存圖片」或「加入照片」，即可存下圖片。","ok");
         };
         try{ canvas.toBlob(b=>show(b),"image/png"); }catch(e){ show(null); }
         return;
@@ -1099,17 +1099,19 @@ function viewChecklistResult(){
           let started=false;
           if(blob){ try{ const u=URL.createObjectURL(blob); started=trigger(u);  }catch(e){} }
           if(!started&&dataUrl) started=trigger(dataUrl);
-          if(started||dataUrl){ preview(); msg(started?"請長按下方圖片（電腦請按右鍵），選擇「儲存圖片」。":"請長按下方圖片儲存。", started?"ok":""); }
+          if(started||dataUrl){ preview(); msg(started?"請長按上方圖片（電腦請按右鍵），選擇「儲存圖片」。":"請長按上方圖片儲存。", started?"ok":""); }
           else msg("無法產生圖片，請改用「複製分享文字」或直接截圖保存。","err");
         },"image/png");
       }catch(e){
-        if(dataUrl&&trigger(dataUrl)){ preview(); msg("請長按下方圖片（電腦請按右鍵），選擇「儲存圖片」。","ok"); }
-        else if(dataUrl){ preview(); msg("請長按下方圖片儲存。",""); }
+        if(dataUrl&&trigger(dataUrl)){ preview(); msg("請長按上方圖片（電腦請按右鍵），選擇「儲存圖片」。","ok"); }
+        else if(dataUrl){ preview(); msg("請長按上方圖片儲存。",""); }
         else msg("無法產生圖片，請改用「複製分享文字」或直接截圖保存。","err");
       }
     };
     try{ if(document.fonts&&document.fonts.ready){ Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1200))]).then(fin,fin); } else fin(); }catch(e){ fin(); }
-  });
+  };
+  $("#sh-dl").addEventListener("click",()=>{ genImg(); const im=$("#sh-img"); if(im&&im.scrollIntoView){ try{ im.scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){} } });
+  genImg();
 }
 /* ---------- routing ---------- */
 function go(h){ if(location.hash===h) route(); else location.hash=h; }
