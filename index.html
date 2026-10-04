@@ -1082,6 +1082,18 @@ function viewChecklistResult(){
       let dataUrl=""; try{ dataUrl=canvas.toDataURL("image/png"); }catch(e){}
       const preview=()=>{ if(dataUrl){ $("#sh-extra").innerHTML=`<img class="sh-prev" alt="分享結果圖預覽" src="${dataUrl}">`; } };
       const trigger=(href)=>{ try{ const a=document.createElement("a"); a.href=href; a.download=name; a.rel="noopener"; document.body.appendChild(a); a.click(); a.remove(); return true; }catch(e){ return false; } };
+      const isMobile=(()=>{ try{ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)||(window.matchMedia&&matchMedia("(pointer:coarse)").matches&&innerWidth<900); }catch(e){ return false; } })();
+      if(isMobile&&dataUrl){
+        // 手機：不強制下載成檔案，改為顯示可長按儲存的圖片，並提供系統分享（可選「儲存圖片」存到相簿）
+        const show=(blob)=>{
+          const canShare=!!(blob&&navigator.share&&navigator.canShare&&(()=>{ try{ return navigator.canShare({files:[new File([blob],name,{type:"image/png"})]}); }catch(e){ return false; } })());
+          $("#sh-extra").innerHTML=`<img class="sh-prev" alt="分享結果圖，長按可儲存圖片" src="${dataUrl}">`+(canShare?`<div class="sh-acts" style="justify-content:center;margin-top:12px"><button class="btn primary" type="button" id="sh-save">📲 儲存圖片／分享</button></div>`:"");
+          if(canShare){ $("#sh-save").addEventListener("click",()=>{ try{ navigator.share({files:[new File([blob],name,{type:"image/png"})]}).catch(()=>{}); }catch(e){} }); }
+          msg(canShare?"請按「儲存圖片／分享」，在選單中選「儲存圖片」；也可以長按下方圖片，選「儲存圖片」或「加入照片」。":"請長按下方圖片，選擇「儲存圖片」或「加入照片」，即可存到相簿。","ok");
+        };
+        try{ canvas.toBlob(b=>show(b),"image/png"); }catch(e){ show(null); }
+        return;
+      }
       try{
         canvas.toBlob(blob=>{
           let started=false;
